@@ -1,4 +1,4 @@
-import { For, List, refkey, type Refkey } from "@alloy-js/core";
+import { For, List, refkey, type Refkey, type Children } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import type { HttpOperation } from "@typespec/http";
 import { TypeExpression } from "@typespec/emitter-framework/typescript";
@@ -28,44 +28,50 @@ export function OperationInterface(props: OperationInterfaceProps) {
   const interfaceRef = getOperationInterfaceRef(containerName);
 
   return (
-    <ts.InterfaceDeclaration
-      name={containerName}
-      export
-      refkey={interfaceRef}
-    >
+    <ts.InterfaceDeclaration name={containerName} export refkey={interfaceRef}>
       <List>
         <For each={operations} hardline semicolon>
           {function renderOperationMethod(operation) {
             const opName = toCamelCase(operation.operation.name);
-            const parameters: { name: string; type: any; optional?: boolean }[] = [];
+            const parameters: {
+              name: string;
+              type: Children;
+              optional?: boolean;
+            }[] = [];
 
-            // Add path parameters
             for (const param of operation.parameters.parameters) {
               if (param.type === "path") {
                 const paramName = toCamelCase(param.param.name);
                 parameters.push({
                   name: paramName,
-                  type: <TypeExpression type={param.param.type} />
+                  type: <TypeExpression type={param.param.type} />,
                 });
               }
             }
 
-            // Add header parameters
+            if (operation.parameters.body) {
+              parameters.push({
+                name: "body",
+                type: <TypeExpression type={operation.parameters.body.type} />,
+              });
+            }
+
             for (const param of operation.parameters.parameters) {
               if (param.type === "header") {
                 const paramName = toCamelCase(param.param.name);
                 parameters.push({
                   name: paramName,
                   type: <TypeExpression type={param.param.type} />,
-                  optional: param.param.optional
+                  optional: param.param.optional,
                 });
               }
             }
 
-            // Add query parameters as options object
-            const queryParams = operation.parameters.parameters.filter(function isQuery(p) {
-              return p.type === "query";
-            });
+            const queryParams = operation.parameters.parameters.filter(
+              function isQuery(p) {
+                return p.type === "query";
+              },
+            );
 
             if (queryParams.length > 0) {
               const optionsType = (
@@ -89,22 +95,15 @@ export function OperationInterface(props: OperationInterfaceProps) {
               parameters.push({
                 name: "options",
                 type: optionsType,
-                optional: true
+                optional: true,
               });
             }
 
-            // Add body parameter if exists
-            if (operation.parameters.body) {
-              parameters.push({
-                name: "body",
-                type: <TypeExpression type={operation.parameters.body.type} />
-              });
-            }
-
-            // Build return type using TypeExpression
             const returnType = (
               <>
-                Promise&lt;<TypeExpression type={operation.operation.returnType} />&gt;
+                Promise&lt;
+                <TypeExpression type={operation.operation.returnType} />
+                &gt;
               </>
             );
 

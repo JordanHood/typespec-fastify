@@ -1,8 +1,12 @@
-import { For, List, refkey, SourceDirectory, type Refkey } from "@alloy-js/core";
+import { For, List, SourceDirectory, type Refkey } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import type { HttpOperation } from "@typespec/http";
-import { RouteRegistration, getRouteRegistrationRef } from "./RouteRegistration.js";
+import {
+  RouteRegistration,
+  getRouteRegistrationRef,
+} from "./RouteRegistration.js";
 import { fastifyLib } from "../external-packages/fastify.js";
+import { getOperationInterfaceRef } from "./OperationInterface.js";
 
 export interface RoutesDirectoryProps {
   groupedOperations: Map<string, HttpOperation[]>;
@@ -14,10 +18,26 @@ export interface RoutesDirectoryProps {
  */
 export function RoutesDirectory(props: RoutesDirectoryProps) {
   const { groupedOperations, loadRoutesRef } = props;
+  const containerNames = Array.from(groupedOperations.keys());
+
+  const operationsType = (
+    <ts.InterfaceExpression>
+      {containerNames.map(function renderContainerProp(containerName) {
+        const interfaceRef = getOperationInterfaceRef(containerName);
+        return (
+          <>
+            <ts.InterfaceMember name={containerName.toLowerCase()}>
+              {interfaceRef}
+            </ts.InterfaceMember>
+            {"; "}
+          </>
+        );
+      })}
+    </ts.InterfaceExpression>
+  );
 
   return (
     <SourceDirectory path="routes">
-      {/* Individual route files per container */}
       <For each={Array.from(groupedOperations.entries())}>
         {function renderRoutes([containerName, operations]) {
           return (
@@ -31,7 +51,6 @@ export function RoutesDirectory(props: RoutesDirectoryProps) {
         }}
       </For>
 
-      {/* Routes loader/index file */}
       <ts.SourceFile path="index.ts">
         <ts.FunctionDeclaration
           name="loadRoutes"
@@ -40,19 +59,21 @@ export function RoutesDirectory(props: RoutesDirectoryProps) {
           async
           parameters={[
             { name: "server", type: fastifyLib.FastifyInstance },
-            { name: "operations", type: "any" }
+            { name: "operations", type: operationsType },
           ]}
           returnType="void"
         >
           <List>
-            <For each={Array.from(groupedOperations.keys())}>
+            <For each={containerNames}>
               {function renderRegistration(containerName) {
                 const routeRegRef = getRouteRegistrationRef(containerName);
+                const containerKey = containerName.toLowerCase();
                 return (
                   <>
+                    await{" "}
                     <ts.FunctionCallExpression
                       target={routeRegRef}
-                      args={[<>server</>, <>operations</>]}
+                      args={[<>server</>, <>operations.{containerKey}</>]}
                     />
                     {";"}
                   </>

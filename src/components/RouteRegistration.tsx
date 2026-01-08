@@ -1,7 +1,11 @@
-import { For, List, refkey, type Refkey } from "@alloy-js/core";
+import { For, List, refkey, type Refkey, type Children } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import type { HttpOperation } from "@typespec/http";
-import { toCamelCase, toPascalCase, getHttpVerb } from "../utils/http-helpers.js";
+import {
+  toCamelCase,
+  toPascalCase,
+  getHttpVerb,
+} from "../utils/http-helpers.js";
 import { fastifyLib } from "../external-packages/fastify.js";
 import { getOperationInterfaceRef } from "./OperationInterface.js";
 
@@ -33,9 +37,10 @@ export function RouteRegistration(props: RouteRegistrationProps) {
       name={functionName}
       export
       refkey={routeRegRef}
+      async
       parameters={[
         { name: "fastify", type: fastifyLib.FastifyInstance },
-        { name: "operations", type: interfaceRef }
+        { name: "operations", type: interfaceRef },
       ]}
       returnType="void"
     >
@@ -50,7 +55,10 @@ export function RouteRegistration(props: RouteRegistrationProps) {
               <>
                 <ts.FunctionCallExpression
                   target={<>fastify.{verb}</>}
-                  args={[<>'{path}'</>, generateRouteHandler(operation, opName)]}
+                  args={[
+                    <>'{path}'</>,
+                    generateRouteHandler(operation, opName),
+                  ]}
                 />
                 {";"}
               </>
@@ -62,33 +70,37 @@ export function RouteRegistration(props: RouteRegistrationProps) {
   );
 }
 
-function generateRouteHandler(
-  operation: HttpOperation,
-  opName: string
-) {
-  // Build call arguments as components
-  const callArgs: any[] = [];
+function generateRouteHandler(operation: HttpOperation, opName: string) {
+  const callArgs: Children[] = [];
 
-  // Path parameters
   for (const param of operation.parameters.parameters) {
     if (param.type === "path") {
       const paramName = toCamelCase(param.param.name);
-      callArgs.push(<>request.params.{paramName}</>);
+      callArgs.push(<>(request.params as any).{paramName}</>);
     }
   }
 
-  // Header parameters
+  if (operation.parameters.body) {
+    callArgs.push(<>request.body as any</>);
+  }
+
   for (const param of operation.parameters.parameters) {
     if (param.type === "header") {
       const headerKey = param.name.toLowerCase();
-      callArgs.push(<>request.headers['{headerKey}']</>);
+      const headerAccess = <>request.headers['{headerKey}']</>;
+      callArgs.push(
+        <>
+          Array.isArray({headerAccess}) ? {headerAccess}[0] : {headerAccess}
+        </>,
+      );
     }
   }
 
-  // Query parameters as options
-  const queryParams = operation.parameters.parameters.filter(function isQuery(p) {
-    return p.type === "query";
-  });
+  const queryParams = operation.parameters.parameters.filter(
+    function isQuery(p) {
+      return p.type === "query";
+    },
+  );
 
   if (queryParams.length > 0) {
     const optionsObj = (
@@ -98,7 +110,7 @@ function generateRouteHandler(
           return (
             <>
               {index > 0 && ", "}
-              {paramName}: request.query.{paramName}
+              {paramName}: (request.query as any).{paramName}
             </>
           );
         })}
@@ -107,33 +119,58 @@ function generateRouteHandler(
     callArgs.push(optionsObj);
   }
 
-  // Body parameter
-  if (operation.parameters.body) {
-    callArgs.push(<>request.body</>);
-  }
-
   return (
     <ts.FunctionExpression
       async
       parameters={[
         { name: "request", type: fastifyLib.FastifyRequest },
-        { name: "reply", type: fastifyLib.FastifyReply }
+        { name: "reply", type: fastifyLib.FastifyReply },
       ]}
     >
       <List>
-        <ts.VarDeclaration name="result">
-          await <ts.FunctionCallExpression
-            target={<>operations.{opName}</>}
-            args={callArgs}
-          />
-        </ts.VarDeclaration>
-        <>
-          <ts.FunctionCallExpression
-            target={<>reply.send</>}
-            args={[<>result</>]}
-          />
-          {";"}
-        </>
+        <>try {"{"}</>
+        <List>
+          <ts.VarDeclaration name="result">
+            await{" "}
+            <ts.FunctionCallExpression
+              target={<>operations.{opName}</>}
+              args={callArgs}
+            />
+          </ts.VarDeclaration>
+          <>
+            <ts.FunctionCallExpression
+              target={<>reply.code</>}
+              args={[<>200</>]}
+            />
+            .
+            <ts.FunctionCallExpression
+              target={<>send</>}
+              args={[<>result</>]}
+            />
+            {";"}
+          </>
+        </List>
+        {"}"} catch (error) {"{"}
+        <List>
+          <>
+            <ts.FunctionCallExpression
+              target={<>reply.code</>}
+              args={[<>500</>]}
+            />
+            .
+            <ts.FunctionCallExpression
+              target={<>send</>}
+              args={[
+                <>
+                  {"{"} error: error instanceof Error ? error.message :
+                  'Internal server error' {"}"}
+                </>,
+              ]}
+            />
+            {";"}
+          </>
+        </List>
+        {"}"}
       </List>
     </ts.FunctionExpression>
   );
