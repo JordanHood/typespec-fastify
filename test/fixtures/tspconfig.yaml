@@ -1,0 +1,6 @@
+emit:
+  - "typespec-emitter-fastify"
+
+options:
+  typespec-emitter-fastify:
+    emitter-output-dir: "{output-dir}"

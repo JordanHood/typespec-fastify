@@ -1,47 +1,68 @@
-// import { Diagnostic, resolvePath } from "@typespec/compiler";
-// import {
-//   createTestHost,
-//   createTestWrapper,
-//   expectDiagnosticEmpty,
-// } from "@typespec/compiler/testing";
-// import { TypespecEmitterFastifyTestLibrary } from "../src/testing/index.js";
+import { Diagnostic, resolvePath } from "@typespec/compiler";
+import {
+  createTestHost,
+  createTestWrapper,
+  expectDiagnosticEmpty,
+} from "@typespec/compiler/testing";
+import { HttpTestLibrary } from "@typespec/http/testing";
+import { TypespecFastifyTestLibrary } from "../src/testing/index.js";
 
-// export async function createTypespecEmitterFastifyTestHost() {
-//   return createTestHost({
-//     libraries: [TypespecEmitterFastifyTestLibrary],
-//   });
-// }
+export async function createTypespecFastifyTestHost() {
+  return createTestHost({
+    libraries: [HttpTestLibrary, TypespecFastifyTestLibrary],
+  });
+}
 
-// export async function createTypespecEmitterFastifyTestRunner() {
-//   const host = await createTypespecEmitterFastifyTestHost();
+export async function createTypespecFastifyTestRunner() {
+  const host = await createTypespecFastifyTestHost();
 
-//   return createTestWrapper(host, {
-//     compilerOptions: {
-//       noEmit: false,
-//       emit: ["typespec-emitter-fastify"],
-//     },
-//   });
-// }
+  return createTestWrapper(host, {
+    compilerOptions: {
+      noEmit: false,
+      emit: ["typespec-fastify"],
+    },
+  });
+}
 
-// export async function emitWithDiagnostics(
-//   code: string
-// ): Promise<[Record<string, string>, readonly Diagnostic[]]> {
-//   const runner = await createTypespecEmitterFastifyTestRunner();
-//   await runner.compileAndDiagnose(code, {
-//     outputDir: "tsp-output",
-//   });
-//   const emitterOutputDir = "./tsp-output/typespec-emitter-fastify";
-//   const files = await runner.program.host.readDir(emitterOutputDir);
+export async function emitWithDiagnostics(
+  code: string,
+): Promise<[Record<string, string>, readonly Diagnostic[]]> {
+  const runner = await createTypespecFastifyTestRunner();
+  await runner.compileAndDiagnose(code, {
+    outputDir: "tsp-output",
+  });
+  const emitterOutputDir = "./tsp-output/typespec-fastify";
 
-//   const result: Record<string, string> = {};
-//   for (const file of files) {
-//     result[file] = (await runner.program.host.readFile(resolvePath(emitterOutputDir, file))).text;
-//   }
-//   return [result, runner.program.diagnostics];
-// }
+  const result: Record<string, string> = {};
 
-// export async function emit(code: string): Promise<Record<string, string>> {
-//   const [result, diagnostics] = await emitWithDiagnostics(code);
-//   expectDiagnosticEmpty(diagnostics);
-//   return result;
-// }
+  async function readFilesRecursive(dir: string, relativePath: string = "") {
+    const entries = await runner.program.host.readDir(dir);
+
+    for (const entry of entries) {
+      const fullPath = resolvePath(dir, entry);
+      const relPath = relativePath ? `${relativePath}/${entry}` : entry;
+
+      try {
+        const stat = await runner.program.host.stat(fullPath);
+        if (stat.isDirectory()) {
+          await readFilesRecursive(fullPath, relPath);
+        } else if (stat.isFile()) {
+          const content = await runner.program.host.readFile(fullPath);
+          result[relPath] = content.text;
+        }
+      } catch {
+        // Skip entries that can't be read
+      }
+    }
+  }
+
+  await readFilesRecursive(emitterOutputDir);
+
+  return [result, runner.program.diagnostics];
+}
+
+export async function emit(code: string): Promise<Record<string, string>> {
+  const [result, diagnostics] = await emitWithDiagnostics(code);
+  expectDiagnosticEmpty(diagnostics);
+  return result;
+}
