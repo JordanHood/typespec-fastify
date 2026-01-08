@@ -1,6 +1,6 @@
 {
   "name": "typespec-fastify",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "type": "module",
   "main": "dist/src/index.js",
   "exports": {
@@ -17,24 +17,25 @@
     "url": "git@github.com:JordanHood/typespec-fastify.git"
   },
   "peerDependencies": {
-    "@alloy-js/core": "0.20.0",
-    "@alloy-js/typescript": "0.20.0",
-    "@typespec/compiler": "latest",
-    "@typespec/emitter-framework": "0.12.0",
-    "@typespec/http": "latest"
+    "@alloy-js/core": ">=0.20.0",
+    "@alloy-js/typescript": ">=0.20.0",
+    "@typespec/compiler": ">=1.0.0",
+    "@typespec/emitter-framework": ">=0.12.0",
+    "@typespec/http": ">=1.0.0"
   },
   "devDependencies": {
-    "@types/node": "latest",
-    "@typescript-eslint/eslint-plugin": "^8.15.0",
-    "@typescript-eslint/parser": "^8.15.0",
-    "@typespec/compiler": "latest",
+    "@changesets/cli": "2.29.8",
+    "@types/node": "24.0.0",
+    "@typescript-eslint/eslint-plugin": "8.15.0",
+    "@typescript-eslint/parser": "8.15.0",
+    "@typespec/compiler": "1.7.1",
     "@vitest/coverage-v8": "4.0.16",
     "@vitest/ui": "4.0.16",
-    "eslint": "^9.15.0",
+    "eslint": "9.15.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.4",
-    "prettier": "^3.3.3",
-    "typescript": "^5.3.3",
+    "prettier": "3.3.3",
+    "typescript": "5.3.3",
     "typescript-eslint": "8.52.0",
     "vitest": "4.0.16"
   },
@@ -43,7 +44,7 @@
   ],
   "keywords": [
     "typespec",
-    "drizzle",
+    "fastify",
     "emitter",
     "tsp",
     "codegen"
@@ -56,9 +57,12 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "release": "changeset publish"
   },
-  "packageManager": "npm@11.6.2+sha512.ee22b335fcbc95662cdf3ab8a053daf045d9cf9c6df6040d28965abb707512b2c16fa6c5eec049d34c74f78f390cebd14f697919eadb97756564d4f9eccc4954",
+  "packageManager": "pnpm@10.27.0",
   "dependencies": {
     "@alloy-js/cli": "0.21.0"
   }

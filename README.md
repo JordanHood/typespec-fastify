@@ -2,9 +2,8 @@
 
 Generates Fastify server code from TypeSpec HTTP service definitions using the Alloy Framework.
 
-> **⚠️ Early Development Notice**
->
-> This project is in early development (v0.0.1) and not production-ready. Expect breaking changes and missing features.
+> [!IMPORTANT]
+> This project is in early development and not production-ready. Expect breaking changes and missing features.
 
 ## Installation
 
@@ -89,80 +88,6 @@ await registerRoutes(server, { pets: petsOperations });
 await server.listen({ port: 3000 });
 ```
 
-## Generated Structure
-
-```text
-generated/
-├── router.ts              # registerRoutes() function
-├── models/
-│   └── petstore.ts       # TypeScript types
-├── operations/
-│   └── pets.ts           # Operation interfaces
-└── routes/
-    ├── pets.routes.ts    # Route handlers
-    └── index.ts          # Route loader
-```
-
-## How It Works
-
-The emitter generates route registration code, not a complete server. You provide:
-
-- Fastify instance and configuration
-- Operation implementations (business logic)
-- Server lifecycle management
-
-Generated code handles:
-
-- Route registration
-- Parameter extraction and mapping
-- Type-safe operation interfaces
-- Basic error handling
-
-## Limitations
-
-**Critical Issues:**
-
-- Status codes hardcoded to 200 (operation result statusCode ignored)
-- Single service only (first @service namespace)
-- No versioning support
-
-**Type Safety:**
-
-- Uses `as any` casts for request objects
-- No schema validation
-- No request/response validation
-
-**Missing Features:**
-
-- OpenAPI metadata (@doc, @summary, @tag)
-- Authentication/security decorators
-- Custom middleware generation
-- Content-type negotiation
-- File upload support
-
-## Testing
-
-Tests use Vitest.
-
-```bash
-npm test              # Run once
-npm run test:watch    # Watch mode
-npm run test:ui       # Browser UI
-npm run test:coverage # Coverage report
-```
-
-## Development
-
-```bash
-npm run build   # Build
-npm run watch   # Watch mode
-
-# Link for testing
-npm link
-cd /path/to/test-project
-npm link typespec-fastify
-```
-
 ## Architecture
 
 **Built with:**
@@ -170,33 +95,6 @@ npm link typespec-fastify
 - Alloy Framework (JSX-based code generation)
 - TypeSpec HTTP (service definitions)
 - TypeSpec Emitter Framework (compiler integration)
-
-**Components:**
-
-- `src/emitter.tsx` - Main orchestration
-- `src/components/` - Code generation
-- `src/utils/` - HTTP helpers, type mapping
-- `src/testing/` - Test infrastructure
-
-## Roadmap
-
-**v0.0.2:**
-
-- Status code extraction
-- Schema validation
-- Multiple services
-
-**v0.1.0:**
-
-- Remove `as any` casts
-- OpenAPI metadata
-- Versioning
-
-**v1.0.0:**
-
-- Feature parity with @typespec/http-server-js
-- Content-type handling
-- Authentication decorators
 
 ## Contributing
 
