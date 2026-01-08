@@ -12,9 +12,11 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
       id-token: write
+      pull-requests: write
+      issues: write
+      contents: write
+      packages: write
     steps:
       - uses: actions/checkout@v4
 
@@ -41,4 +43,4 @@ jobs:
           commit: "Release version"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ""
