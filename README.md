@@ -1,47 +1,48 @@
 # TypeSpec Fastify Emitter
 
-A TypeSpec emitter that generates Fastify server code from TypeSpec HTTP service definitions using the Alloy Framework.
+Generates Fastify server code from TypeSpec HTTP service definitions using the Alloy Framework.
 
-## Features
-
-- ✅ Generates complete Fastify application setup
-- ✅ OpenAPI/Swagger integration with fastify-swagger
-- ✅ TypeBox schema generation for request/response validation
-- ✅ Error handling with standard HTTP error schemas
-- ✅ TypeScript types from TypeSpec models
-- ✅ Clean, maintainable code structure
+> **⚠️ Early Development Notice**
+>
+> This project is in early development (v0.0.1) and not production-ready. Expect breaking changes and missing features.
 
 ## Installation
 
 ```bash
-npm install --save-dev typespec-emitter-fastify
+npm install --save-dev typespec-fastify
 ```
+
+## Features
+
+- Route handlers generated from TypeSpec operations
+- TypeScript operation interfaces for business logic
+- Automatic parameter extraction (path, query, headers, body)
+- Type-safe code generation
+- User-controlled server lifecycle
 
 ## Usage
 
-### 1. Create a TypeSpec Configuration
+### 1. Configure TypeSpec
 
-Create a `tspconfig.yaml` file in your project:
+Create `tspconfig.yaml`:
 
 ```yaml
 emit:
-  - "typespec-emitter-fastify"
+  - "typespec-fastify"
 options:
-  "typespec-emitter-fastify":
+  "typespec-fastify":
     "output-dir": "{project-root}/src/generated"
 ```
 
-### 2. Define Your TypeSpec Service
+### 2. Define Service
 
-Create your TypeSpec files (e.g., `main.tsp`):
+Create `main.tsp`:
 
 ```typespec
 import "@typespec/http";
+using TypeSpec.Http;
 
-using Http;
-
-@service({ title: "Pet Store API" })
-@server("https://api.example.com", "Production server")
+@service
 namespace PetStore;
 
 model Pet {
@@ -51,122 +52,156 @@ model Pet {
 }
 
 @route("/pets")
-namespace Pets {
-  @get
-  op listPets(): {
-    @statusCode statusCode: 200;
-    @body pets: Pet[];
-  };
-
-  @get
-  op getPet(@path petId: int32): {
-    @statusCode statusCode: 200;
-    @body pet: Pet;
-  };
+interface Pets {
+  @get list(@query limit?: int32): Pet[];
+  @get get(@path petId: int32): Pet;
+  @post create(@body pet: Pet): Pet;
 }
 ```
 
-### 3. Compile Your TypeSpec
+### 3. Compile
 
 ```bash
 npx tsp compile .
 ```
 
-## Generated Output Structure
+### 4. Implement
 
-The emitter generates the following structure:
+```typescript
+import fastify from "fastify";
+import { registerRoutes } from "./generated/router.js";
+import type { Pets } from "./generated/operations/pets.js";
 
+const petsOperations: Pets = {
+  async list(options) {
+    return [{ id: 1, name: "Fluffy", age: 3 }];
+  },
+  async get(petId) {
+    return { id: petId, name: "Fluffy", age: 3 };
+  },
+  async create(body) {
+    return { ...body, id: 123 };
+  },
+};
+
+const server = fastify({ logger: true });
+await registerRoutes(server, { pets: petsOperations });
+await server.listen({ port: 3000 });
 ```
-output-dir/
-├── app.ts                    # Fastify app creation with middleware
-├── server.ts                 # Server startup function
-├── types/
-│   └── models.ts            # TypeScript type definitions
-├── schemas/
-│   └── errors.ts            # TypeBox error response schemas
-├── routes/
-│   └── loader.ts            # Route registration
-└── interfaces/
-    └── operations.ts        # Operation interfaces for business logic
+
+## Generated Structure
+
+```text
+generated/
+├── router.ts              # registerRoutes() function
+├── models/
+│   └── petstore.ts       # TypeScript types
+├── operations/
+│   └── pets.ts           # Operation interfaces
+└── routes/
+    ├── pets.routes.ts    # Route handlers
+    └── index.ts          # Route loader
 ```
 
-### Generated Files
+## How It Works
 
-#### `app.ts`
+The emitter generates route registration code, not a complete server. You provide:
 
-Contains the `createApp()` function that sets up:
-- Fastify instance with logging
-- Swagger/OpenAPI documentation
+- Fastify instance and configuration
+- Operation implementations (business logic)
+- Server lifecycle management
+
+Generated code handles:
+
 - Route registration
-- Global error handler
+- Parameter extraction and mapping
+- Type-safe operation interfaces
+- Basic error handling
 
-#### `server.ts`
+## Limitations
 
-Contains the `start()` function that:
-- Creates the Fastify app
-- Listens on configurable host/port from environment variables
-- Logs server startup information
+**Critical Issues:**
 
-#### `schemas/errors.ts`
+- Status codes hardcoded to 200 (operation result statusCode ignored)
+- Single service only (first @service namespace)
+- No versioning support
 
-TypeBox schemas for standard HTTP errors:
-- `Error400Schema` - Bad Request
-- `Error404Schema` - Not Found
-- `Error500Schema` - Internal Server Error
+**Type Safety:**
 
-## Current Status
+- Uses `as any` casts for request objects
+- No schema validation
+- No request/response validation
 
-This is an initial implementation with basic infrastructure in place. The following features are functional:
+**Missing Features:**
 
-- ✅ Basic project structure
-- ✅ Fastify app and server generation
-- ✅ Error schema generation
-- ✅ Component-based architecture using Alloy Framework
+- OpenAPI metadata (@doc, @summary, @tag)
+- Authentication/security decorators
+- Custom middleware generation
+- Content-type negotiation
+- File upload support
 
-### Upcoming Features
+## Testing
 
-- 🚧 Route handler generation from TypeSpec operations
-- 🚧 TypeBox schema generation for request/response validation
-- 🚧 TypeScript type generation from TypeSpec models
-- 🚧 Operation interface generation for business logic
-- 🚧 OpenAPI metadata integration
+Tests use Vitest.
+
+```bash
+npm test              # Run once
+npm run test:watch    # Watch mode
+npm run test:ui       # Browser UI
+npm run test:coverage # Coverage report
+```
 
 ## Development
 
-### Building
-
 ```bash
-npm run build
-```
+npm run build   # Build
+npm run watch   # Watch mode
 
-### Testing
-
-Link the emitter to a test project:
-
-```bash
+# Link for testing
 npm link
 cd /path/to/test-project
-npm link typespec-emitter-fastify
+npm link typespec-fastify
 ```
 
 ## Architecture
 
-This emitter uses:
-- **Alloy Framework** (`@alloy-js/core`, `@alloy-js/typescript`) for code generation
-- **TypeSpec HTTP** (`@typespec/http`) for HTTP service definitions
-- **Emitter Framework** (`@typespec/emitter-framework`) for TypeSpec integration
+**Built with:**
 
-### Component Structure
+- Alloy Framework (JSX-based code generation)
+- TypeSpec HTTP (service definitions)
+- TypeSpec Emitter Framework (compiler integration)
 
-- `src/emitter.tsx` - Main emitter entry point
-- `src/fastify-context.ts` - Shared context provider
-- `src/components/` - Generation components for each output file
-- `src/utils/` - Helper utilities for parameter extraction, naming, etc.
+**Components:**
+
+- `src/emitter.tsx` - Main orchestration
+- `src/components/` - Code generation
+- `src/utils/` - HTTP helpers, type mapping
+- `src/testing/` - Test infrastructure
+
+## Roadmap
+
+**v0.0.2:**
+
+- Status code extraction
+- Schema validation
+- Multiple services
+
+**v0.1.0:**
+
+- Remove `as any` casts
+- OpenAPI metadata
+- Versioning
+
+**v1.0.0:**
+
+- Feature parity with @typespec/http-server-js
+- Content-type handling
+- Authentication decorators
 
 ## Contributing
 
-This emitter is under active development. Contributions are welcome!
+Contributions welcome.
 
 ## License
 
-UNLICENSED
+MIT
