@@ -5,5 +5,11 @@
 tsp-output/
 dist/
 
+# Test fixtures output
+test/fixtures/tsp-output/
+
+# Coverage
+coverage/
+
 # Dependency directories
 node_modules/

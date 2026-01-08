@@ -10,8 +10,9 @@ export const fastifyLib = createPackage({
   version: "^5.0.0",
   descriptor: {
     ".": {
+      default: "Fastify",
       named: [
-        'fastify',
+        "fastify",
         "FastifyInstance",
         "FastifyRequest",
         "FastifyReply",

@@ -1,6 +1,6 @@
-import type { Operation, Program } from "@typespec/compiler";
+import type { Program } from "@typespec/compiler";
 import { listServices } from "@typespec/compiler";
-import { getHttpOperation, getHttpService, type HttpOperation } from "@typespec/http";
+import { getHttpService, type HttpOperation } from "@typespec/http";
 
 export interface ServiceInfo {
   operations: HttpOperation[];
@@ -17,7 +17,6 @@ export function getHttpOperations(program: Program): ServiceInfo | undefined {
     return undefined;
   }
 
-  // For now, we only support single service
   const [service] = services;
 
   const [httpService, diagnostics] = getHttpService(program, service.type);
@@ -40,7 +39,7 @@ export function getHttpOperations(program: Program): ServiceInfo | undefined {
  * Groups operations by their container (namespace or interface)
  */
 export function groupOperationsByContainer(
-  operations: HttpOperation[]
+  operations: HttpOperation[],
 ): Map<string, HttpOperation[]> {
   const grouped = new Map<string, HttpOperation[]>();
 

@@ -8,19 +8,17 @@ import type { HttpOperation } from "@typespec/http";
  */
 export function discoverTypesFromOperations(
   program: Program,
-  operations: HttpOperation[]
+  operations: HttpOperation[],
 ): Type[] {
   const discoveredTypes = new Set<Type>();
 
   for (const operation of operations) {
     const op = operation.operation;
 
-    // Collect types from operation parameters
     if (op.parameters.kind === "Model") {
       collectTypesFromModel(op.parameters);
     }
 
-    // Collect types from return type
     navigateType(
       op.returnType,
       {
@@ -28,10 +26,9 @@ export function discoverTypesFromOperations(
         enum: collectType,
         union: collectType,
       },
-      { includeTemplateDeclaration: false }
+      { includeTemplateDeclaration: false },
     );
 
-    // Collect types from HTTP body
     if (operation.parameters.body) {
       navigateType(
         operation.parameters.body.type,
@@ -40,7 +37,7 @@ export function discoverTypesFromOperations(
           enum: collectType,
           union: collectType,
         },
-        { includeTemplateDeclaration: false }
+        { includeTemplateDeclaration: false },
       );
     }
   }
@@ -61,7 +58,7 @@ export function discoverTypesFromOperations(
         enum: collectType,
         union: collectType,
       },
-      { includeTemplateDeclaration: false }
+      { includeTemplateDeclaration: false },
     );
   }
 }
@@ -81,9 +78,13 @@ function shouldReference(program: Program, type: Type): boolean {
  */
 function isDeclaration(type: Type): boolean {
   return (
-    (type.kind === "Model" && "name" in type && typeof type.name === "string") ||
+    (type.kind === "Model" &&
+      "name" in type &&
+      typeof type.name === "string") ||
     (type.kind === "Enum" && "name" in type && typeof type.name === "string") ||
-    (type.kind === "Union" && "name" in type && typeof type.name === "string") ||
+    (type.kind === "Union" &&
+      "name" in type &&
+      typeof type.name === "string") ||
     (type.kind === "Scalar" && "name" in type && typeof type.name === "string")
   );
 }
@@ -92,7 +93,9 @@ function isDeclaration(type: Type): boolean {
  * Checks if a type has a name
  */
 function hasName(type: Type): boolean {
-  return "name" in type && typeof type.name === "string" && type.name.length > 0;
+  return (
+    "name" in type && typeof type.name === "string" && type.name.length > 0
+  );
 }
 
 /**
