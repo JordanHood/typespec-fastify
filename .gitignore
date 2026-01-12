@@ -8,8 +8,15 @@ dist/
 # Test fixtures output
 test/fixtures/tsp-output/
 
+# E2E test generated code
+test/e2e/generated/
+
 # Coverage
 coverage/
+
+# E2E logs and reports
+temp/
+http-specs-report.md
 
 # Dependency directories
 node_modules/

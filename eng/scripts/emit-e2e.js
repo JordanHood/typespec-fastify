@@ -1,0 +1,145 @@
+#!/usr/bin/env node
+import { exec } from "child_process";
+import { promisify } from "util";
+import { mkdir, rm, readFile, writeFile } from "fs/promises";
+import { resolve, join, dirname } from "path";
+import { fileURLToPath } from "url";
+import { readdirSync, statSync, existsSync } from "fs";
+
+const execAsync = promisify(exec);
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const projectRoot = resolve(__dirname, "../..");
+const specsPath = resolve(
+  projectRoot,
+  "node_modules/@typespec/http-specs/specs",
+);
+const outputBase = resolve(projectRoot, "test/e2e/generated");
+const tspConfigPath = resolve(__dirname, "tspconfig.yaml");
+const testIgnorePath = resolve(projectRoot, ".testignore");
+
+async function getIgnoreList() {
+  try {
+    const content = await readFile(testIgnorePath, "utf8");
+    return content
+      .split(/\r?\n/)
+      .filter((line) => line.trim() && !line.startsWith("#"))
+      .map((line) => line.trim());
+  } catch {
+    return [];
+  }
+}
+
+function findScenarios(dir, relativePath = "") {
+  const scenarios = [];
+  const entries = readdirSync(dir);
+
+  for (const entry of entries) {
+    const fullPath = join(dir, entry);
+    const stat = statSync(fullPath);
+
+    if (stat.isDirectory()) {
+      const mainTsp = join(fullPath, "main.tsp");
+      if (existsSync(mainTsp)) {
+        const scenarioPath = relativePath ? `${relativePath}/${entry}` : entry;
+        scenarios.push({ path: mainTsp, name: scenarioPath });
+      } else {
+        scenarios.push(
+          ...findScenarios(
+            fullPath,
+            relativePath ? `${relativePath}/${entry}` : entry,
+          ),
+        );
+      }
+    }
+  }
+
+  return scenarios;
+}
+
+async function emitScenario(scenario, ignoreList) {
+  if (ignoreList.some((ignore) => scenario.name.startsWith(ignore))) {
+    console.log(`⏭️  Skipped: ${scenario.name}`);
+    return { status: "skipped", scenario: scenario.name };
+  }
+
+  const outputDir = join(outputBase, scenario.name);
+
+  try {
+    if (existsSync(outputDir)) {
+      await rm(outputDir, { recursive: true, force: true });
+    }
+    await mkdir(outputDir, { recursive: true });
+
+    const { stdout, stderr } = await execAsync(
+      `npx tsp compile "${scenario.path}" --emit ${projectRoot} --config "${tspConfigPath}" --output-dir "${outputDir}"`,
+      { cwd: projectRoot },
+    );
+
+    const hasError = stderr.includes("error") || stderr.includes("Failed");
+
+    if (hasError) {
+      console.error(`❌ ${scenario.name}`);
+      const logDir = join(
+        projectRoot,
+        "temp/emit-e2e-logs",
+        dirname(scenario.name),
+      );
+      await mkdir(logDir, { recursive: true });
+      const logFile = join(logDir, "error.log");
+      await writeFile(logFile, stdout + "\n" + stderr, "utf8");
+      return { status: "failed", scenario: scenario.name, error: "Compilation failed" };
+    }
+
+    console.log(`✅ ${scenario.name}`);
+    return { status: "success", scenario: scenario.name };
+  } catch (error) {
+    console.error(`❌ ${scenario.name}`);
+    const logDir = join(
+      projectRoot,
+      "temp/emit-e2e-logs",
+      dirname(scenario.name),
+    );
+    await mkdir(logDir, { recursive: true });
+    const logFile = join(logDir, "error.log");
+    const errorOutput = (error.stdout || "") + "\n" + (error.stderr || "") + "\n" + error.message;
+    await writeFile(logFile, errorOutput, "utf8");
+    return { status: "failed", scenario: scenario.name, error: error.message };
+  }
+}
+
+async function main() {
+  console.log("🔨 Emitting E2E test scenarios...\n");
+
+  const ignoreList = await getIgnoreList();
+  const scenarios = findScenarios(specsPath);
+
+  console.log(`Found ${scenarios.length} scenarios\n`);
+
+  const results = [];
+  for (const scenario of scenarios) {
+    const result = await emitScenario(scenario, ignoreList);
+    results.push(result);
+  }
+
+  const succeeded = results.filter((r) => r.status === "success");
+  const failed = results.filter((r) => r.status === "failed");
+  const skipped = results.filter((r) => r.status === "skipped");
+
+  console.log("\n📊 Summary:");
+  console.log(`  Succeeded: ${succeeded.length}`);
+  console.log(`  Failed: ${failed.length}`);
+  console.log(`  Skipped: ${skipped.length}`);
+  console.log(`  Total: ${scenarios.length}`);
+
+  if (failed.length > 0) {
+    console.log("\n❌ Failed scenarios:");
+    failed.forEach((f) => console.log(`  - ${f.scenario}`));
+    console.log("\nSee temp/emit-e2e-logs/ for details");
+    process.exit(1);
+  }
+
+  console.log("\n✅ All scenarios emitted successfully!");
+}
+
+main();

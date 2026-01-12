@@ -50,8 +50,10 @@ export async function emitWithDiagnostics(
           const content = await runner.program.host.readFile(fullPath);
           result[relPath] = content.text;
         }
-      } catch {
-        // Skip entries that can't be read
+      } catch (error) {
+        if (error) {
+          continue;
+        }
       }
     }
   }

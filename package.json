@@ -2,25 +2,25 @@
   "name": "typespec-fastify",
   "version": "0.1.0",
   "type": "module",
-  "main": "dist/src/index.js",
+  "main": "dist/index.js",
   "exports": {
     ".": {
-      "types": "./dist/src/index.d.ts",
-      "default": "./dist/src/index.js"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
     "./testing": {
-      "types": "./dist/src/testing/index.d.ts",
-      "default": "./dist/src/testing/index.js"
+      "types": "./dist/testing/index.d.ts",
+      "default": "./dist/testing/index.js"
     }
   },
   "repository": {
-    "url": "git@github.com:JordanHood/typespec-fastify.git"
+    "url": "git+ssh://git@github.com/JordanHood/typespec-fastify.git"
   },
   "peerDependencies": {
     "@alloy-js/core": ">=0.20.0",
     "@alloy-js/typescript": ">=0.20.0",
     "@typespec/compiler": ">=1.0.0",
-    "@typespec/emitter-framework": ">=0.12.0",
+    "@typespec/emitter-framework": ">=0.14.0",
     "@typespec/http": ">=1.0.0"
   },
   "devDependencies": {
@@ -31,18 +31,24 @@
     "@typescript-eslint/eslint-plugin": "8.52.0",
     "@typescript-eslint/parser": "8.52.0",
     "@typespec/compiler": "1.7.1",
+    "@typespec/http-specs": "0.1.0-alpha.29",
+    "@typespec/spector": "0.1.0-alpha.21",
     "@vitest/coverage-v8": "4.0.16",
     "@vitest/ui": "4.0.16",
     "eslint": "9.39.2",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.4",
+    "fastify": "5.6.2",
     "prettier": "3.7.4",
     "typescript": "5.9.3",
     "typescript-eslint": "8.52.0",
     "vitest": "4.0.16"
   },
   "files": [
-    "dist/"
+    "dist/src",
+    "README.md",
+    "LICENSE",
+    "package.json"
   ],
   "keywords": [
     "typespec",
@@ -58,6 +64,9 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
+    "test:e2e": "pnpm emit:e2e && pnpm run:e2e",
+    "emit:e2e": "node eng/scripts/emit-e2e.js",
+    "run:e2e": "vitest run --config vitest.config.e2e.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "changeset": "changeset",

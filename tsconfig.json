@@ -4,8 +4,10 @@
     "useDefineForClassFields": true,
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "lib": ["ES2022"],
-    "rootDir": ".",
+    "lib": [
+      "ES2022"
+    ],
+    "rootDir": "src",
     "outDir": "dist",
     "sourceMap": true,
     "declaration": true,
@@ -14,6 +16,11 @@
     "jsxImportSource": "@alloy-js/core",
     "strict": true
   },
-  "include": ["src", "test"],
-  "exclude": ["test/fixtures/tsp-output", "examples"]
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "examples",
+    "temp"
+  ]
 }

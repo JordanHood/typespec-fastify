@@ -1,11 +1,8 @@
 import { For, List, refkey, type Refkey, type Children } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
+import { useTSNamePolicy } from "@alloy-js/typescript";
 import type { HttpOperation } from "@typespec/http";
-import {
-  toCamelCase,
-  toPascalCase,
-  getHttpVerb,
-} from "../utils/http-helpers.js";
+import { getHttpVerb } from "../utils/http-helpers.js";
 import { fastifyLib } from "../external-packages/fastify.js";
 import { getOperationInterfaceRef } from "./OperationInterface.js";
 
@@ -28,7 +25,11 @@ export function getRouteRegistrationRef(containerName: string): Refkey {
  */
 export function RouteRegistration(props: RouteRegistrationProps) {
   const { containerName, operations } = props;
-  const functionName = `register${toPascalCase(containerName)}Routes`;
+  const namePolicy = useTSNamePolicy();
+  const functionName = namePolicy.getName(
+    `register_${containerName}_routes`,
+    "function",
+  );
   const interfaceRef = getOperationInterfaceRef(containerName);
   const routeRegRef = getRouteRegistrationRef(containerName);
 
@@ -46,10 +47,13 @@ export function RouteRegistration(props: RouteRegistrationProps) {
     >
       <List>
         <For each={operations} hardline>
-          {function renderRoute(operation) {
+          {(operation) => {
             const verb = getHttpVerb(operation);
             const path = operation.path;
-            const opName = toCamelCase(operation.operation.name);
+            const opName = namePolicy.getName(
+              operation.operation.name,
+              "function",
+            );
 
             return (
               <>
@@ -57,7 +61,7 @@ export function RouteRegistration(props: RouteRegistrationProps) {
                   target={<>fastify.{verb}</>}
                   args={[
                     <>'{path}'</>,
-                    generateRouteHandler(operation, opName),
+                    generateRouteHandler(operation, opName, namePolicy),
                   ]}
                 />
                 {";"}
@@ -70,12 +74,16 @@ export function RouteRegistration(props: RouteRegistrationProps) {
   );
 }
 
-function generateRouteHandler(operation: HttpOperation, opName: string) {
+function generateRouteHandler(
+  operation: HttpOperation,
+  opName: string,
+  namePolicy: ReturnType<typeof useTSNamePolicy>,
+) {
   const callArgs: Children[] = [];
 
   for (const param of operation.parameters.parameters) {
     if (param.type === "path") {
-      const paramName = toCamelCase(param.param.name);
+      const paramName = namePolicy.getName(param.param.name, "parameter");
       callArgs.push(<>(request.params as any).{paramName}</>);
     }
   }
@@ -97,16 +105,17 @@ function generateRouteHandler(operation: HttpOperation, opName: string) {
   }
 
   const queryParams = operation.parameters.parameters.filter(
-    function isQuery(p) {
-      return p.type === "query";
-    },
+    (p) => p.type === "query",
   );
 
   if (queryParams.length > 0) {
     const optionsObj = (
       <ts.ObjectExpression>
-        {queryParams.map(function renderQueryProp(param, index) {
-          const paramName = toCamelCase(param.param.name);
+        {queryParams.map((param, index) => {
+          const paramName = namePolicy.getName(
+            param.param.name,
+            "object-member-data",
+          );
           return (
             <>
               {index > 0 && ", "}

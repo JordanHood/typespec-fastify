@@ -22,33 +22,30 @@ export function RoutesDirectory(props: RoutesDirectoryProps) {
 
   const operationsType = (
     <ts.InterfaceExpression>
-      {containerNames.map(function renderContainerProp(containerName) {
-        const interfaceRef = getOperationInterfaceRef(containerName);
-        return (
-          <>
+      <For each={containerNames} semicolon hardline>
+        {(containerName) => {
+          const interfaceRef = getOperationInterfaceRef(containerName);
+          return (
             <ts.InterfaceMember name={containerName.toLowerCase()}>
               {interfaceRef}
             </ts.InterfaceMember>
-            {"; "}
-          </>
-        );
-      })}
+          );
+        }}
+      </For>
     </ts.InterfaceExpression>
   );
 
   return (
     <SourceDirectory path="routes">
       <For each={Array.from(groupedOperations.entries())}>
-        {function renderRoutes([containerName, operations]) {
-          return (
-            <ts.SourceFile path={`${containerName.toLowerCase()}.routes.ts`}>
-              <RouteRegistration
-                containerName={containerName}
-                operations={operations}
-              />
-            </ts.SourceFile>
-          );
-        }}
+        {([containerName, operations]) => (
+          <ts.SourceFile path={`${containerName.toLowerCase()}.routes.ts`}>
+            <RouteRegistration
+              containerName={containerName}
+              operations={operations}
+            />
+          </ts.SourceFile>
+        )}
       </For>
 
       <ts.SourceFile path="index.ts">
@@ -65,7 +62,7 @@ export function RoutesDirectory(props: RoutesDirectoryProps) {
         >
           <List>
             <For each={containerNames}>
-              {function renderRegistration(containerName) {
+              {(containerName) => {
                 const routeRegRef = getRouteRegistrationRef(containerName);
                 const containerKey = containerName.toLowerCase();
                 return (

@@ -14,16 +14,14 @@ export function OperationsDirectory(props: OperationsDirectoryProps) {
   return (
     <SourceDirectory path="operations">
       <For each={Array.from(props.groupedOperations.entries())}>
-        {function renderOperationInterface([containerName, operations]) {
-          return (
-            <ts.SourceFile path={`${containerName.toLowerCase()}.ts`}>
-              <OperationInterface
-                containerName={containerName}
-                operations={operations}
-              />
-            </ts.SourceFile>
-          );
-        }}
+        {([containerName, operations]) => (
+          <ts.SourceFile path={`${containerName.toLowerCase()}.ts`}>
+            <OperationInterface
+              containerName={containerName}
+              operations={operations}
+            />
+          </ts.SourceFile>
+        )}
       </For>
     </SourceDirectory>
   );

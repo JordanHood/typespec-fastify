@@ -1,4 +1,5 @@
 import { refkey, SourceDirectory } from "@alloy-js/core";
+import { createTSNamePolicy } from "@alloy-js/typescript";
 import type { EmitContext } from "@typespec/compiler";
 import { Output, writeOutput } from "@typespec/emitter-framework";
 import { ModelsDirectory } from "./components/ModelsDirectory.js";
@@ -26,12 +27,15 @@ export async function $onEmit(context: EmitContext<EmitterOptions>) {
     context.program,
     httpInfo.operations,
   );
-
   const loadRoutesRef = refkey("loadRoutes", "route-loader");
 
   await writeOutput(
     context.program,
-    <Output program={context.program} externals={[fastifyLib]}>
+    <Output
+      program={context.program}
+      externals={[fastifyLib]}
+      namePolicy={createTSNamePolicy()}
+    >
       <SourceDirectory path=".">
         <ModelsDirectory namespace={httpInfo.namespace} types={allTypes} />
         <OperationsDirectory groupedOperations={groupedOperations} />
