@@ -1,9 +1,16 @@
-import { For, List, refkey, type Refkey, type Children } from "@alloy-js/core";
+import {
+  For,
+  List,
+  refkey,
+  type Refkey,
+  type Children,
+  code,
+} from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
+import { useTSNamePolicy } from "@alloy-js/typescript";
 import type { HttpOperation } from "@typespec/http";
 import { TypeExpression } from "@typespec/emitter-framework/typescript";
-import { toCamelCase } from "../utils/http-helpers.js";
-
+import { useTsp } from "@typespec/emitter-framework";
 export interface OperationInterfaceProps {
   containerName: string;
   operations: HttpOperation[];
@@ -26,13 +33,17 @@ export function getOperationInterfaceRef(containerName: string): Refkey {
 export function OperationInterface(props: OperationInterfaceProps) {
   const { containerName, operations } = props;
   const interfaceRef = getOperationInterfaceRef(containerName);
-
+  const namePolicy = useTSNamePolicy();
   return (
     <ts.InterfaceDeclaration name={containerName} export refkey={interfaceRef}>
       <List>
         <For each={operations} hardline semicolon>
-          {function renderOperationMethod(operation) {
-            const opName = toCamelCase(operation.operation.name);
+          {(operation) => {
+            // const responses = $.httpOperation.flattenResponses(operation);
+            const opName = namePolicy.getName(
+              operation.operation.name,
+              "function",
+            );
             const parameters: {
               name: string;
               type: Children;
@@ -41,7 +52,10 @@ export function OperationInterface(props: OperationInterfaceProps) {
 
             for (const param of operation.parameters.parameters) {
               if (param.type === "path") {
-                const paramName = toCamelCase(param.param.name);
+                const paramName = namePolicy.getName(
+                  param.param.name,
+                  "parameter",
+                );
                 parameters.push({
                   name: paramName,
                   type: <TypeExpression type={param.param.type} />,
@@ -58,7 +72,10 @@ export function OperationInterface(props: OperationInterfaceProps) {
 
             for (const param of operation.parameters.parameters) {
               if (param.type === "header") {
-                const paramName = toCamelCase(param.param.name);
+                const paramName = namePolicy.getName(
+                  param.param.name,
+                  "parameter",
+                );
                 parameters.push({
                   name: paramName,
                   type: <TypeExpression type={param.param.type} />,
@@ -68,28 +85,28 @@ export function OperationInterface(props: OperationInterfaceProps) {
             }
 
             const queryParams = operation.parameters.parameters.filter(
-              function isQuery(p) {
-                return p.type === "query";
-              },
+              (p) => p.type === "query",
             );
 
             if (queryParams.length > 0) {
               const optionsType = (
                 <ts.InterfaceExpression>
-                  {queryParams.map(function renderQueryParam(param) {
-                    const paramName = toCamelCase(param.param.name);
-                    return (
-                      <>
+                  <For each={queryParams} semicolon hardline>
+                    {(param) => {
+                      const paramName = namePolicy.getName(
+                        param.param.name,
+                        "interface-member",
+                      );
+                      return (
                         <ts.InterfaceMember
                           name={paramName}
                           optional={param.param.optional}
                         >
                           <TypeExpression type={param.param.type} />
                         </ts.InterfaceMember>
-                        {"; "}
-                      </>
-                    );
-                  })}
+                      );
+                    }}
+                  </For>
                 </ts.InterfaceExpression>
               );
               parameters.push({
@@ -98,15 +115,7 @@ export function OperationInterface(props: OperationInterfaceProps) {
                 optional: true,
               });
             }
-
-            const returnType = (
-              <>
-                Promise&lt;
-                <TypeExpression type={operation.operation.returnType} />
-                &gt;
-              </>
-            );
-
+            const returnType = code`Promise<${(<TypeExpression type={operation.operation.returnType} />)}>`;
             return (
               <ts.InterfaceMethod
                 name={opName}

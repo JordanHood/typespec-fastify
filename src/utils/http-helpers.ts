@@ -74,29 +74,3 @@ export function getHttpVerb(operation: HttpOperation): string {
 export function getOperationPath(operation: HttpOperation): string {
   return operation.path;
 }
-
-/**
- * Converts a name to camelCase
- */
-export function toCamelCase(name: string): string {
-  return name.charAt(0).toLowerCase() + name.slice(1);
-}
-
-/**
- * Converts a name to PascalCase
- */
-export function toPascalCase(name: string): string {
-  return name.charAt(0).toUpperCase() + name.slice(1);
-}
-
-/**
- * Converts a path to a route name
- * e.g., "/pets/{petId}" -> "pets-petId"
- */
-export function pathToRouteName(path: string): string {
-  return path
-    .replace(/^\//, "")
-    .replace(/\//g, "-")
-    .replace(/\{/g, "")
-    .replace(/\}/g, "");
-}

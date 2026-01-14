@@ -1,4 +1,4 @@
-import { code, type Refkey } from "@alloy-js/core";
+import { code, type Refkey, For } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import type { HttpOperation } from "@typespec/http";
 import { fastifyLib } from "../external-packages/fastify.js";
@@ -19,17 +19,16 @@ export function RouterFile(props: RouterFileProps) {
 
   const operationsType = (
     <ts.InterfaceExpression>
-      {containerNames.map(function renderContainerProp(containerName) {
-        const interfaceRef = getOperationInterfaceRef(containerName);
-        return (
-          <>
+      <For each={containerNames} semicolon hardline>
+        {(containerName) => {
+          const interfaceRef = getOperationInterfaceRef(containerName);
+          return (
             <ts.InterfaceMember name={containerName.toLowerCase()}>
               {interfaceRef}
             </ts.InterfaceMember>
-            {"; "}
-          </>
-        );
-      })}
+          );
+        }}
+      </For>
     </ts.InterfaceExpression>
   );
 
