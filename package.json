@@ -2,15 +2,15 @@
   "name": "typespec-fastify",
   "version": "0.1.0",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
     },
     "./testing": {
-      "types": "./dist/testing/index.d.ts",
-      "default": "./dist/testing/index.js"
+      "types": "./dist/src/testing/index.d.ts",
+      "default": "./dist/src/testing/index.js"
     }
   },
   "repository": {
@@ -27,22 +27,22 @@
     "@changesets/changelog-github": "0.5.2",
     "@changesets/cli": "2.29.8",
     "@eslint/js": "9.39.2",
-    "@types/node": "25.0.3",
-    "@typescript-eslint/eslint-plugin": "8.52.0",
-    "@typescript-eslint/parser": "8.52.0",
-    "@typespec/compiler": "1.7.1",
-    "@typespec/http-specs": "0.1.0-alpha.29",
-    "@typespec/spector": "0.1.0-alpha.21",
-    "@vitest/coverage-v8": "4.0.16",
-    "@vitest/ui": "4.0.16",
+    "@types/node": "25.0.8",
+    "@typescript-eslint/eslint-plugin": "8.53.0",
+    "@typescript-eslint/parser": "8.53.0",
+    "@typespec/compiler": "1.8.0",
+    "@typespec/http-specs": "0.1.0-alpha.30",
+    "@typespec/spector": "0.1.0-alpha.22",
+    "@vitest/coverage-v8": "4.0.17",
+    "@vitest/ui": "4.0.17",
     "eslint": "9.39.2",
     "eslint-config-prettier": "10.1.8",
-    "eslint-plugin-prettier": "5.5.4",
+    "eslint-plugin-prettier": "5.5.5",
     "fastify": "5.6.2",
     "prettier": "3.7.4",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.52.0",
-    "vitest": "4.0.16"
+    "typescript-eslint": "8.53.0",
+    "vitest": "4.0.17"
   },
   "files": [
     "dist/src",
@@ -60,7 +60,8 @@
   "scripts": {
     "build": "alloy build",
     "watch": "alloy build --watch",
-    "test": "vitest run",
+    "test": "pnpm test:unit && pnpm test:e2e",
+    "test:unit": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
@@ -73,7 +74,7 @@
     "version": "changeset version",
     "release": "changeset publish"
   },
-  "packageManager": "pnpm@10.27.0",
+  "packageManager": "pnpm@10.28.0",
   "dependencies": {
     "@alloy-js/cli": "0.22.0"
   }

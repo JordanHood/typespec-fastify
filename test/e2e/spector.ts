@@ -17,7 +17,7 @@ export async function runScenario(
         "knock",
         "./node_modules/@typespec/http-specs/specs",
         "--filter",
-        scenario,
+        `${scenario}/**/*`,
         "--baseUrl",
         baseUrl,
       ],

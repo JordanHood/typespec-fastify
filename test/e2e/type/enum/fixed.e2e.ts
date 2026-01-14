@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import fastify from "fastify";
-import { registerRoutes } from "./generated/type/enum/fixed/router.js";
-import { startServer } from "./helpers.js";
-import { runScenario } from "./spector.js";
+import { registerRoutes } from "../../generated/type/enum/fixed/router.js";
+import { startServer } from "../../helpers.js";
+import { runScenario } from "../../spector.js";
+import type { String } from "../../generated/type/enum/fixed/operations/string.js";
+import { DaysOfWeekEnum } from "../../generated/type/enum/fixed/models/fixed.js";
 
-describe.skip("Type.Enum.Fixed", () => {
+describe("Type.Enum.Fixed", () => {
   let serverAbortController: AbortController;
 
   beforeEach(() => {
@@ -16,12 +18,33 @@ describe.skip("Type.Enum.Fixed", () => {
   });
 
   it("passes all scenarios", async () => {
-    // TODO: Import operation interfaces and implement handlers
-    // const operations = { ... };
+    const stringOps: String = {
+      getKnownValue: async function () {
+        return {
+          contentType: "application/json",
+          body: DaysOfWeekEnum.Monday,
+        };
+      },
+      putKnownValue: async function (
+        body: DaysOfWeekEnum,
+        contentType: "application/json",
+      ) {
+        return;
+      },
+      putUnknownValue: async function (
+        body: DaysOfWeekEnum,
+        contentType: "application/json",
+      ) {
+        throw new Error("Unknown value not supported for fixed enum");
+      },
+    };
+
+    const operations = {
+      string: stringOps,
+    };
 
     const app = fastify({ logger: false });
-    // TODO: Register routes with operations
-    // await registerRoutes(app, operations);
+    await registerRoutes(app, operations);
 
     const baseUrl = await startServer(app, serverAbortController.signal);
     const { status } = await runScenario("type/enum/fixed", baseUrl);

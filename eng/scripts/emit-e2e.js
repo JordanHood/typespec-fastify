@@ -116,10 +116,15 @@ async function main() {
 
   console.log(`Found ${scenarios.length} scenarios\n`);
 
+  const concurrencyLimit = 4;
   const results = [];
-  for (const scenario of scenarios) {
-    const result = await emitScenario(scenario, ignoreList);
-    results.push(result);
+
+  for (let i = 0; i < scenarios.length; i += concurrencyLimit) {
+    const batch = scenarios.slice(i, i + concurrencyLimit);
+    const batchResults = await Promise.all(
+      batch.map((scenario) => emitScenario(scenario, ignoreList))
+    );
+    results.push(...batchResults);
   }
 
   const succeeded = results.filter((r) => r.status === "success");

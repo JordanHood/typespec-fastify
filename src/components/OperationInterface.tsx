@@ -10,7 +10,6 @@ import * as ts from "@alloy-js/typescript";
 import { useTSNamePolicy } from "@alloy-js/typescript";
 import type { HttpOperation } from "@typespec/http";
 import { TypeExpression } from "@typespec/emitter-framework/typescript";
-import { useTsp } from "@typespec/emitter-framework";
 export interface OperationInterfaceProps {
   containerName: string;
   operations: HttpOperation[];
@@ -31,7 +30,6 @@ export function getOperationInterfaceRef(containerName: string): Refkey {
  * for each operation that the user will implement.
  */
 export function OperationInterface(props: OperationInterfaceProps) {
-  const { $ } = useTsp();
   const { containerName, operations } = props;
   const interfaceRef = getOperationInterfaceRef(containerName);
   const namePolicy = useTSNamePolicy();

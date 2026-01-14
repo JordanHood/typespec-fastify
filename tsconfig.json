@@ -7,7 +7,7 @@
     "lib": [
       "ES2022"
     ],
-    "rootDir": "src",
+    "rootDir": ".",
     "outDir": "dist",
     "sourceMap": true,
     "declaration": true,
@@ -17,9 +17,11 @@
     "strict": true
   },
   "include": [
-    "src"
+    "src",
+    "test"
   ],
   "exclude": [
+    "test/e2e/generated",
     "examples",
     "temp"
   ]

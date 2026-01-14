@@ -1,10 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import fastify from "fastify";
-import { registerRoutes } from "./generated/type/model/usage/router.js";
-import { startServer } from "./helpers.js";
-import { runScenario } from "./spector.js";
+import { registerRoutes } from "../../generated/type/model/usage/router.js";
+import type { Usage } from "../../generated/type/model/usage/operations/usage.js";
+import { startServer } from "../../helpers.js";
+import { runScenario } from "../../spector.js";
 
-describe.skip("Type.Model.Usage", () => {
+describe("Type.Model.Usage", () => {
   let serverAbortController: AbortController;
 
   beforeEach(() => {
@@ -16,12 +17,20 @@ describe.skip("Type.Model.Usage", () => {
   });
 
   it("passes all scenarios", async () => {
-    // TODO: Import operation interfaces and implement handlers
-    // const operations = { ... };
+    const operations: Usage = {
+      async input(body) {
+        return;
+      },
+      async output() {
+        return { requiredProp: "example-value" };
+      },
+      async inputAndOutput(body) {
+        return { requiredProp: "example-value" };
+      },
+    };
 
     const app = fastify({ logger: false });
-    // TODO: Register routes with operations
-    // await registerRoutes(app, operations);
+    await registerRoutes(app, { usage: operations });
 
     const baseUrl = await startServer(app, serverAbortController.signal);
     const { status } = await runScenario("type/model/usage", baseUrl);
