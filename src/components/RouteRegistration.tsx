@@ -2,6 +2,7 @@ import { For, List, refkey, type Refkey, type Children } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import { useTSNamePolicy } from "@alloy-js/typescript";
 import type { HttpOperation } from "@typespec/http";
+import { isVoidType } from "@typespec/compiler";
 import { getHttpVerb } from "../utils/http-helpers.js";
 import { fastifyLib } from "../external-packages/fastify.js";
 import { getOperationInterfaceRef } from "./OperationInterface.js";
@@ -98,7 +99,7 @@ function generateRouteHandler(
       const headerAccess = <>request.headers['{headerKey}']</>;
       callArgs.push(
         <>
-          Array.isArray({headerAccess}) ? {headerAccess}[0] : {headerAccess}
+          (Array.isArray({headerAccess}) ? {headerAccess}[0] : {headerAccess}) as string
         </>,
       );
     }
@@ -128,6 +129,12 @@ function generateRouteHandler(
     callArgs.push(optionsObj);
   }
 
+  const isVoid = isVoidType(operation.operation.returnType);
+  const is204Response = operation.responses.some(function (r) {
+    return r.statusCodes === 204;
+  });
+  const isNoContent = isVoid || is204Response;
+
   return (
     <ts.FunctionExpression
       async
@@ -137,7 +144,8 @@ function generateRouteHandler(
       ]}
     >
       <List>
-        <>try {"{"}</>
+        <>try {"{"}
+        </>
         <List>
           <ts.VarDeclaration name="result">
             await{" "}
@@ -146,40 +154,22 @@ function generateRouteHandler(
               args={callArgs}
             />
           </ts.VarDeclaration>
-          <>
-            <ts.FunctionCallExpression
-              target={<>reply.code</>}
-              args={[<>200</>]}
-            />
-            .
-            <ts.FunctionCallExpression
-              target={<>send</>}
-              args={[<>result</>]}
-            />
-            {";"}
-          </>
+          {isNoContent ? (
+            <>reply.code(result.statusCode).send();</>
+          ) : (
+            <>reply.code(result.statusCode).send(result.body);</>
+          )}
         </List>
-        {"}"} catch (error) {"{"}
+        <>{"}"} catch (error) {"{"}
+        </>
         <List>
           <>
-            <ts.FunctionCallExpression
-              target={<>reply.code</>}
-              args={[<>500</>]}
-            />
-            .
-            <ts.FunctionCallExpression
-              target={<>send</>}
-              args={[
-                <>
-                  {"{"} error: error instanceof Error ? error.message :
-                  'Internal server error' {"}"}
-                </>,
-              ]}
-            />
-            {";"}
+            reply.code(500).send({"{"} error: error instanceof Error ?
+            error.message : 'Internal server error' {"}"});
           </>
         </List>
-        {"}"}
+        <>{"}"}
+        </>
       </List>
     </ts.FunctionExpression>
   );

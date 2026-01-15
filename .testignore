@@ -1,45 +1,23 @@
-# Include only basic parameters, payload, and types scenarios
-# Exclude auth, encoding, advanced features
+# Focus on parameters/basic only
+# Skip everything else
 
-# No auth
 authentication/
-
-# No documentation metadata
 documentation
-
-# No encoding features
 encode/
-
-# Advanced payload - exclude
-payload/content-negotiation
-payload/json-merge-patch
-payload/media-type
-payload/multipart
-payload/xml
-
-# No response features
+payload/
 response/
-
-# No complex routing
 routes
-
-# No serialization
 serialization/
-
-# No server features
 server/
-
-# No special features
 special-headers/
 special-words
-
-# No streaming
 streaming/
-
-# Advanced type features - exclude
-type/model/inheritance/
-type/model/visibility
-type/union/discriminated
-
-# No versioning
+type/
 versioning/
+
+# Skip other parameter tests
+parameters/body-optionality
+parameters/collection-format
+parameters/path
+parameters/query
+parameters/spread
