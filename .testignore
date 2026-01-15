@@ -1,0 +1,19 @@
+# Focus on parameters/basic only
+# Skip everything else
+
+authentication/
+documentation
+encode/
+payload/
+response/
+routes
+serialization/
+server/
+special-headers/
+special-words
+streaming/
+type/
+versioning/
+
+# Skip other parameter tests
+parameters/collection-format

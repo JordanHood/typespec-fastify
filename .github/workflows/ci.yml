@@ -32,5 +32,11 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      - name: Test
-        run: pnpm test
+      - name: Type check
+        run: pnpm run type
+
+      - name: Run unit tests
+        run: pnpm run test:unit
+
+      - name: Run e2e tests
+        run: pnpm run test:e2e

@@ -9,8 +9,9 @@ import {
 import * as ts from "@alloy-js/typescript";
 import { useTSNamePolicy } from "@alloy-js/typescript";
 import type { HttpOperation } from "@typespec/http";
+import { isVoidType } from "@typespec/compiler";
 import { TypeExpression } from "@typespec/emitter-framework/typescript";
-import { useTsp } from "@typespec/emitter-framework";
+import { getNoContentResponseRef } from "./ResponseTypes.js";
 export interface OperationInterfaceProps {
   containerName: string;
   operations: HttpOperation[];
@@ -39,7 +40,6 @@ export function OperationInterface(props: OperationInterfaceProps) {
       <List>
         <For each={operations} hardline semicolon>
           {(operation) => {
-            // const responses = $.httpOperation.flattenResponses(operation);
             const opName = namePolicy.getName(
               operation.operation.name,
               "function",
@@ -59,6 +59,7 @@ export function OperationInterface(props: OperationInterfaceProps) {
                 parameters.push({
                   name: paramName,
                   type: <TypeExpression type={param.param.type} />,
+                  optional: param.param.optional,
                 });
               }
             }
@@ -115,7 +116,15 @@ export function OperationInterface(props: OperationInterfaceProps) {
                 optional: true,
               });
             }
-            const returnType = code`Promise<${(<TypeExpression type={operation.operation.returnType} />)}>`;
+            const isVoid = isVoidType(operation.operation.returnType);
+            const is204Response = operation.responses.some(function (r) {
+              return r.statusCodes === 204;
+            });
+            const shouldEmitVoid = isVoid || is204Response;
+            const noContentRef = getNoContentResponseRef();
+            const returnType = shouldEmitVoid
+              ? code`Promise<${noContentRef}>`
+              : code`Promise<ResponseWithBody<${(<TypeExpression type={operation.operation.returnType} />)}>>`;
             return (
               <ts.InterfaceMethod
                 name={opName}
