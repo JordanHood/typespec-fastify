@@ -1,3 +1,4 @@
+import { deepStrictEqual } from "node:assert";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import fastify from "fastify";
 import { registerRoutes } from "../generated/parameters/path/router.js";
@@ -19,10 +20,12 @@ describe("Parameters.Path", () => {
   it("passes all scenarios", async () => {
     const pathOps: Path = {
       normal: async function (name) {
-        return;
+        deepStrictEqual(name, "foo");
+        return { statusCode: 204 };
       },
       optional: async function (name) {
-        return;
+        deepStrictEqual(typeof name === "string" || name === undefined, true);
+        return { statusCode: 204 };
       },
     };
 

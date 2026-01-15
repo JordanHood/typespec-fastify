@@ -59,6 +59,7 @@ export function OperationInterface(props: OperationInterfaceProps) {
                 parameters.push({
                   name: paramName,
                   type: <TypeExpression type={param.param.type} />,
+                  optional: param.param.optional,
                 });
               }
             }

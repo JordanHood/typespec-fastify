@@ -50,7 +50,22 @@ export function RouteRegistration(props: RouteRegistrationProps) {
         <For each={operations} hardline>
           {(operation) => {
             const verb = getHttpVerb(operation);
-            const path = operation.path;
+            const rawPath = operation.uriTemplate || operation.path;
+
+            const optionalParams = new Set();
+            for (const param of operation.parameters.parameters) {
+              if (param.type === "path" && param.param.optional) {
+                optionalParams.add(param.param.name);
+              }
+            }
+
+            const path = rawPath.replace(/\{([^}]+)\}/g, function(match, p1) {
+              const paramName = p1.startsWith("/") ? p1.slice(1) : p1;
+              const prefix = p1.startsWith("/") ? "/:" : ":";
+              const suffix = optionalParams.has(paramName) ? "?" : "";
+              return prefix + paramName + suffix;
+            });
+
             const opName = namePolicy.getName(
               operation.operation.name,
               "function",
