@@ -1,4 +1,4 @@
-import { refkey, type Refkey, code } from "@alloy-js/core";
+import { refkey, type Refkey } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 
 export function getNoContentResponseRef(): Refkey {
@@ -11,7 +11,6 @@ export function getResponseWithBodyRef(): Refkey {
 
 export function ResponseTypes() {
   const noContentRef = getNoContentResponseRef();
-  const responseWithBodyRef = getResponseWithBodyRef();
 
   return (
     <>
@@ -31,9 +30,6 @@ export function ResponseTypes() {
         {"  "}body: TBody;
         {"\n"}
         {"}"}
-
-
-       
       </>
     </>
   );
@@ -45,7 +41,8 @@ export function ResponseTypes() {
     body: T
     }
  */
-{/* <ts.InterfaceDeclaration
+{
+  /* <ts.InterfaceDeclaration
   name="ResponseWithBody"
   export
   refkey={responseWithBodyRef}
@@ -55,4 +52,5 @@ export function ResponseTypes() {
     statusCode: number;{"\n"}
     body: T
   </>
-</ts.InterfaceDeclaration> */}
+</ts.InterfaceDeclaration> */
+}

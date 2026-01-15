@@ -19,23 +19,23 @@ describe("Parameters.Collection-format", () => {
 
   it("passes all scenarios", async () => {
     const headerOps: Header = {
-      csv: async function (colors) {
-        return;
+      csv: async function (_colors) {
+        return { statusCode: 204 };
       },
     };
 
     const queryOps: Query = {
-      multi: async function (options) {
-        return;
+      multi: async function (_options) {
+        return { statusCode: 204 };
       },
-      ssv: async function (options) {
-        return;
+      ssv: async function (_options) {
+        return { statusCode: 204 };
       },
-      pipes: async function (options) {
-        return;
+      pipes: async function (_options) {
+        return { statusCode: 204 };
       },
-      csv: async function (options) {
-        return;
+      csv: async function (_options) {
+        return { statusCode: 204 };
       },
     };
 
