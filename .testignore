@@ -17,4 +17,3 @@ versioning/
 
 # Skip other parameter tests
 parameters/collection-format
-parameters/spread
