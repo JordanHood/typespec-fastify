@@ -38,7 +38,7 @@
   ],
   "scripts": {
     "build:emitter": "alloy build",
-    "build": "pnpm build:emitter && pnpm emit:e2e --silent && pnpm build:emitter && pnpm type",
+    "build": "pnpm build:emitter && pnpm emit:e2e --silent && pnpm build:emitter",
     "watch": "alloy build --watch",
     "type": "tsc --noEmit -p tsconfig.test.json",
     "test": "pnpm type && pnpm test:unit && pnpm test:e2e",

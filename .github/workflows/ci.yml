@@ -29,11 +29,11 @@ jobs:
       - name: Lint
         run: pnpm run lint
 
-      - name: Type check
-        run: pnpm run type
-
       - name: Build
         run: pnpm run build
+
+      - name: Type check
+        run: pnpm run type
 
       - name: Run unit tests
         run: pnpm run test:unit
