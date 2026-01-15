@@ -15,7 +15,10 @@ let nextId = 3;
 const petsOperations: Pets = {
   async list(options) {
     const limit = options?.limit ?? pets.length;
-    return pets.slice(0, limit);
+    return {
+      statusCode: 200,
+      body: pets.slice(0, limit),
+    };
   },
 
   async create(body) {
@@ -24,7 +27,10 @@ const petsOperations: Pets = {
       ...body,
     };
     pets.push(newPet);
-    return newPet;
+    return {
+      statusCode: 201,
+      body: newPet,
+    };
   },
 
   async get(petId) {
@@ -34,7 +40,10 @@ const petsOperations: Pets = {
     if (!pet) {
       throw new Error(`Pet with id ${petId} not found`);
     }
-    return pet;
+    return {
+      statusCode: 200,
+      body: pet,
+    };
   },
 
   async update(petId, body) {
@@ -45,7 +54,10 @@ const petsOperations: Pets = {
       throw new Error(`Pet with id ${petId} not found`);
     }
     pets[index] = body;
-    return body;
+    return {
+      statusCode: 200,
+      body: body,
+    };
   },
 
   async delete(petId) {
@@ -56,6 +68,7 @@ const petsOperations: Pets = {
       throw new Error(`Pet with id ${petId} not found`);
     }
     pets.splice(index, 1);
+    return { statusCode: 204 };
   },
 };
 

@@ -46,11 +46,29 @@ The emitter generates:
 - **Route handlers** (`routes/*.ts`) - Fastify route registration functions
 - **Router** (`router.ts`) - Main `registerRoutes()` function
 - **Models** (`models/*.ts`) - TypeScript type definitions
+- **Response types** (`models/response-types.ts`) - `NoContentResponse` and `ResponseWithBody<T>`
 
 You provide:
 
 - **Fastify instance** - Configure it however you want
-- **Operation implementations** - Your business logic
+- **Operation implementations** - Your business logic that returns response objects
 - **Server lifecycle** - When to start/stop
 
-This gives you full control over your server while the emitter handles the HTTP routing boilerplate.
+### Response Objects
+
+Operations return response objects that control the HTTP response:
+
+```typescript
+// For operations returning data
+return {
+  statusCode: 200,
+  body: data
+};
+
+// For operations with no content (like DELETE)
+return {
+  statusCode: 204
+};
+```
+
+This gives you full control over your server and status codes while the emitter handles the HTTP routing boilerplate.
