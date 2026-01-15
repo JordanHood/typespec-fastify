@@ -16,6 +16,5 @@ type/
 versioning/
 
 # Skip other parameter tests
-parameters/body-optionality
 parameters/collection-format
 parameters/spread

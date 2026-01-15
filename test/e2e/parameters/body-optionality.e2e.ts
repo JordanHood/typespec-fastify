@@ -1,3 +1,4 @@
+import { deepStrictEqual } from "node:assert";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import fastify from "fastify";
 import { registerRoutes } from "../generated/parameters/body-optionality/router.js";
@@ -20,19 +21,23 @@ describe("Parameters.Body-optionality", () => {
   it("passes all scenarios", async () => {
     const bodyOptionalityOps: BodyOptionality = {
       requiredExplicit: async function (body) {
-        return;
+        deepStrictEqual(body, { name: "foo" });
+        return { statusCode: 204 };
       },
       requiredImplicit: async function (body) {
-        return;
+        deepStrictEqual(body, { name: "foo" });
+        return { statusCode: 204 };
       },
     };
 
     const optionalExplicitOps: OptionalExplicit = {
       set: async function (body) {
-        return;
+        deepStrictEqual(body, { name: "foo" });
+        return { statusCode: 204 };
       },
       omit: async function (body) {
-        return;
+        deepStrictEqual(body, undefined);
+        return { statusCode: 204 };
       },
     };
 
@@ -46,7 +51,7 @@ describe("Parameters.Body-optionality", () => {
 
     const baseUrl = await startServer(app, serverAbortController.signal);
     const { status } = await runScenario(
-      "parameters/body-optionality",
+      "parameters/bodyoptionality",
       baseUrl,
     );
     expect(status).toBe("pass");
