@@ -38,7 +38,10 @@ describe("Type.Dictionary", () => {
 
     const int64ValueOps: Int64Value = {
       get: async function () {
-        return { k1: BigInt("9223372036854775807"), k2: BigInt("-9223372036854775807") };
+        return {
+          k1: BigInt("9223372036854775807"),
+          k2: BigInt("-9223372036854775807"),
+        };
       },
       put: async function (body: Record<string, bigint>) {
         return;

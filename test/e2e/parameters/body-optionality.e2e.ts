@@ -50,10 +50,7 @@ describe("Parameters.Body-optionality", () => {
     await registerRoutes(app, operations);
 
     const baseUrl = await startServer(app, serverAbortController.signal);
-    const { status } = await runScenario(
-      "parameters/bodyoptionality",
-      baseUrl,
-    );
+    const { status } = await runScenario("parameters/bodyoptionality", baseUrl);
     expect(status).toBe("pass");
   });
 });

@@ -66,7 +66,11 @@ describe("Type.Property.Value-types", () => {
 
     const bytesOps: Bytes = {
       get: async function () {
-        return { property: new Uint8Array(Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64")) };
+        return {
+          property: new Uint8Array(
+            Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64"),
+          ),
+        };
       },
       put: async function (body) {
         return;

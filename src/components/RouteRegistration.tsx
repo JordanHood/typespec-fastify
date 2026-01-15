@@ -59,7 +59,7 @@ export function RouteRegistration(props: RouteRegistrationProps) {
               }
             }
 
-            const path = rawPath.replace(/\{([^}]+)\}/g, function(match, p1) {
+            const path = rawPath.replace(/\{([^}]+)\}/g, function (match, p1) {
               const paramName = p1.startsWith("/") ? p1.slice(1) : p1;
               const prefix = p1.startsWith("/") ? "/:" : ":";
               const suffix = optionalParams.has(paramName) ? "?" : "";
@@ -114,7 +114,8 @@ function generateRouteHandler(
       const headerAccess = <>request.headers['{headerKey}']</>;
       callArgs.push(
         <>
-          (Array.isArray({headerAccess}) ? {headerAccess}[0] : {headerAccess}) as string
+          (Array.isArray({headerAccess}) ? {headerAccess}[0] : {headerAccess})
+          as string
         </>,
       );
     }
@@ -159,8 +160,7 @@ function generateRouteHandler(
       ]}
     >
       <List>
-        <>try {"{"}
-        </>
+        <>try {"{"}</>
         <List>
           <ts.VarDeclaration name="result">
             await{" "}
@@ -175,7 +175,8 @@ function generateRouteHandler(
             <>reply.code(result.statusCode).send(result.body);</>
           )}
         </List>
-        <>{"}"} catch (error) {"{"}
+        <>
+          {"}"} catch (error) {"{"}
         </>
         <List>
           <>
@@ -183,8 +184,7 @@ function generateRouteHandler(
             error.message : 'Internal server error' {"}"});
           </>
         </List>
-        <>{"}"}
-        </>
+        <>{"}"}</>
       </List>
     </ts.FunctionExpression>
   );

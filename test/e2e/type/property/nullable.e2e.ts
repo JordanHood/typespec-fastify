@@ -42,7 +42,9 @@ describe("Type.Property.Nullable", () => {
       getNonNull: async function () {
         return {
           requiredProperty: "foo",
-          nullableProperty: new Uint8Array(Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64")),
+          nullableProperty: new Uint8Array(
+            Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64"),
+          ),
         };
       },
       getNull: async function () {
@@ -98,7 +100,7 @@ describe("Type.Property.Nullable", () => {
           requiredProperty: "foo",
           nullableProperty: [
             new Uint8Array(Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64")),
-            new Uint8Array(Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64"))
+            new Uint8Array(Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64")),
           ],
         };
       },

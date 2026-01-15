@@ -49,7 +49,11 @@ describe("Type.Property.Optionality", () => {
 
     const bytesOps: Bytes = {
       getAll: async function () {
-        return { property: new Uint8Array(Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64")) };
+        return {
+          property: new Uint8Array(
+            Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64"),
+          ),
+        };
       },
       getDefault: async function () {
         return {};
@@ -124,10 +128,12 @@ describe("Type.Property.Optionality", () => {
 
     const collectionsByteOps: CollectionsByte = {
       getAll: async function () {
-        return { property: [
-          new Uint8Array(Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64")),
-          new Uint8Array(Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64"))
-        ] };
+        return {
+          property: [
+            new Uint8Array(Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64")),
+            new Uint8Array(Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64")),
+          ],
+        };
       },
       getDefault: async function () {
         return {};
