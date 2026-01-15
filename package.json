@@ -37,10 +37,11 @@
     "codegen"
   ],
   "scripts": {
-    "prebuild": "node eng/scripts/emit-e2e.js --silent",
-    "build": "alloy build",
+    "build:emitter": "alloy build",
+    "build": "pnpm build:emitter && pnpm emit:e2e --silent && pnpm build:emitter && pnpm type",
     "watch": "alloy build --watch",
-    "test": "pnpm test:unit && pnpm test:e2e",
+    "type": "tsc --noEmit -p tsconfig.test.json",
+    "test": "pnpm type && pnpm test:unit && pnpm test:e2e",
     "test:unit": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
