@@ -18,5 +18,4 @@ versioning/
 # Skip other parameter tests
 parameters/body-optionality
 parameters/collection-format
-parameters/query
 parameters/spread

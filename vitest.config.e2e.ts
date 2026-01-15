@@ -8,6 +8,7 @@ export default defineConfig({
     include: [
       "test/e2e/parameters/basic.e2e.ts",
       "test/e2e/parameters/path.e2e.ts",
+      "test/e2e/parameters/query.e2e.ts",
     ],
   },
 });
