@@ -45,7 +45,7 @@
     "vitest": "4.0.17"
   },
   "files": [
-    "dist/src",
+    "dist",
     "README.md",
     "LICENSE",
     "package.json"
@@ -58,21 +58,22 @@
     "codegen"
   ],
   "scripts": {
+    "prebuild": "node eng/scripts/emit-e2e.js --silent",
     "build": "alloy build",
-    "watch": "alloy build --watch",
-    "test": "pnpm test:unit && pnpm test:e2e",
-    "test:unit": "vitest run",
-    "test:watch": "vitest",
-    "test:ui": "vitest --ui",
-    "test:coverage": "vitest run --coverage",
-    "test:e2e": "pnpm emit:e2e && pnpm run:e2e",
+    "changeset": "changeset",
     "emit:e2e": "node eng/scripts/emit-e2e.js",
-    "run:e2e": "vitest run --config vitest.config.e2e.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "changeset": "changeset",
+    "release": "changeset publish",
+    "run:e2e": "vitest run --config vitest.config.e2e.ts",
+    "test": "pnpm emit:e2e && pnpm test:unit && pnpm test:e2e",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "pnpm run:e2e",
+    "test:ui": "vitest --ui",
+    "test:unit": "vitest run",
+    "test:watch": "vitest",
     "version": "changeset version",
-    "release": "changeset publish"
+    "watch": "alloy build --watch"
   },
   "packageManager": "pnpm@10.28.0",
   "dependencies": {

@@ -1,3 +1,4 @@
+import { deepStrictEqual } from "node:assert";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import fastify from "fastify";
 import { registerRoutes } from "../generated/parameters/spread/router.js";
@@ -20,37 +21,60 @@ describe("Parameters.Spread", () => {
   it("passes all scenarios", async () => {
     const aliasOps: Alias = {
       spreadAsRequestBody: async function (body) {
-        return;
+        deepStrictEqual(body, { name: "foo" });
+        return { statusCode: 204 };
       },
-      spreadParameterWithInnerModel: async function (id: any, body: any, xMsTestHeader: any) {
-        return;
+      spreadParameterWithInnerModel: async function (id, body, xMsTestHeader) {
+        deepStrictEqual(id, "1");
+        deepStrictEqual(body, { name: "foo" });
+        deepStrictEqual(xMsTestHeader, "bar");
+        return { statusCode: 204 };
       },
-      spreadAsRequestParameter: async function (id: any, body: any, xMsTestHeader: any) {
-        return;
+      spreadAsRequestParameter: async function (id, body, xMsTestHeader) {
+        deepStrictEqual(id, "1");
+        deepStrictEqual(body, { name: "foo" });
+        deepStrictEqual(xMsTestHeader, "bar");
+        return { statusCode: 204 };
       },
-      spreadWithMultipleParameters: async function (id: any, body: any, xMsTestHeader: any) {
-        return;
+      spreadWithMultipleParameters: async function (id, body, xMsTestHeader) {
+        deepStrictEqual(id, "1");
+        deepStrictEqual(xMsTestHeader, "bar");
+        return { statusCode: 204 };
       },
-      spreadParameterWithInnerAlias: async function (id: any, body: any, xMsTestHeader: any) {
-        return;
+      spreadParameterWithInnerAlias: async function (id, body, xMsTestHeader) {
+        deepStrictEqual(id, "1");
+        deepStrictEqual(body.name, "foo");
+        deepStrictEqual(body.age, 1);
+        deepStrictEqual(xMsTestHeader, "bar");
+        return { statusCode: 204 };
       },
     };
 
     const modelOps: Model = {
       spreadAsRequestBody: async function (body) {
-        return;
+        deepStrictEqual(body, { name: "foo" });
+        return { statusCode: 204 };
       },
-      spreadCompositeRequestOnlyWithBody: async function (body: any) {
-        return;
+      spreadCompositeRequestOnlyWithBody: async function (body) {
+        deepStrictEqual(body, { name: "foo" });
+        return { statusCode: 204 };
       },
-      spreadCompositeRequestWithoutBody: async function (name: any, testHeader: any) {
-        return;
+      spreadCompositeRequestWithoutBody: async function (name, testHeader) {
+        deepStrictEqual(name, "foo");
+        deepStrictEqual(testHeader, "bar");
+        return { statusCode: 204 };
       },
-      spreadCompositeRequest: async function (name: any, body: any, testHeader: any) {
-        return;
+      spreadCompositeRequest: async function (name, body, testHeader) {
+        deepStrictEqual(name, "foo");
+        deepStrictEqual(body, { name: "foo" });
+        deepStrictEqual(testHeader, "bar");
+        return { statusCode: 204 };
       },
-      spreadCompositeRequestMix: async function (name: any, body: any, testHeader: any) {
-        return;
+      spreadCompositeRequestMix: async function (name, body, testHeader) {
+        deepStrictEqual(name, "foo");
+        deepStrictEqual(body, { prop: "foo" });
+        deepStrictEqual(testHeader, "bar");
+        return { statusCode: 204 };
       },
     };
 

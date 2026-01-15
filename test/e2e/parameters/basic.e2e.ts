@@ -1,3 +1,4 @@
+import { deepStrictEqual } from "node:assert";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import fastify from "fastify";
 import { registerRoutes } from "../generated/parameters/basic/router.js";
@@ -20,13 +21,15 @@ describe("Parameters.Basic", () => {
   it("passes all scenarios", async () => {
     const explicitBodyOps: ExplicitBody = {
       simple: async function (body) {
-        return;
+        deepStrictEqual(body, { name: "foo" });
+        return { statusCode: 204 };
       },
     };
 
     const implicitBodyOps: ImplicitBody = {
       simple: async function (body) {
-        return;
+        deepStrictEqual(body, { name: "foo" });
+        return { statusCode: 204 };
       },
     };
 

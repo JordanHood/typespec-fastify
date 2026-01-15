@@ -57,9 +57,9 @@ function findScenarios(dir, relativePath = "") {
   return scenarios;
 }
 
-async function emitScenario(scenario, ignoreList) {
+async function emitScenario(scenario, ignoreList, silent = false) {
   if (ignoreList.some((ignore) => scenario.name.startsWith(ignore))) {
-    console.log(`⏭️  Skipped: ${scenario.name}`);
+    if (!silent) console.log(`⏭️  Skipped: ${scenario.name}`);
     return { status: "skipped", scenario: scenario.name };
   }
 
@@ -79,7 +79,7 @@ async function emitScenario(scenario, ignoreList) {
     const hasError = stderr.includes("error") || stderr.includes("Failed");
 
     if (hasError) {
-      console.error(`❌ ${scenario.name}`);
+      if (!silent) console.error(`❌ ${scenario.name}`);
       const logDir = join(
         projectRoot,
         "temp/emit-e2e-logs",
@@ -91,10 +91,10 @@ async function emitScenario(scenario, ignoreList) {
       return { status: "failed", scenario: scenario.name, error: "Compilation failed" };
     }
 
-    console.log(`✅ ${scenario.name}`);
+    if (!silent) console.log(`✅ ${scenario.name}`);
     return { status: "success", scenario: scenario.name };
   } catch (error) {
-    console.error(`❌ ${scenario.name}`);
+    if (!silent) console.error(`❌ ${scenario.name}`);
     const logDir = join(
       projectRoot,
       "temp/emit-e2e-logs",
@@ -109,12 +109,14 @@ async function emitScenario(scenario, ignoreList) {
 }
 
 async function main() {
-  console.log("🔨 Emitting E2E test scenarios...\n");
+  const silent = process.argv.includes("--silent");
+
+  if (!silent) console.log("🔨 Emitting E2E test scenarios...\n");
 
   const ignoreList = await getIgnoreList();
   const scenarios = findScenarios(specsPath);
 
-  console.log(`Found ${scenarios.length} scenarios\n`);
+  if (!silent) console.log(`Found ${scenarios.length} scenarios\n`);
 
   const concurrencyLimit = 4;
   const results = [];
@@ -122,7 +124,7 @@ async function main() {
   for (let i = 0; i < scenarios.length; i += concurrencyLimit) {
     const batch = scenarios.slice(i, i + concurrencyLimit);
     const batchResults = await Promise.all(
-      batch.map((scenario) => emitScenario(scenario, ignoreList))
+      batch.map((scenario) => emitScenario(scenario, ignoreList, silent))
     );
     results.push(...batchResults);
   }
@@ -131,20 +133,24 @@ async function main() {
   const failed = results.filter((r) => r.status === "failed");
   const skipped = results.filter((r) => r.status === "skipped");
 
-  console.log("\n📊 Summary:");
-  console.log(`  Succeeded: ${succeeded.length}`);
-  console.log(`  Failed: ${failed.length}`);
-  console.log(`  Skipped: ${skipped.length}`);
-  console.log(`  Total: ${scenarios.length}`);
+  if (!silent) {
+    console.log("\n📊 Summary:");
+    console.log(`  Succeeded: ${succeeded.length}`);
+    console.log(`  Failed: ${failed.length}`);
+    console.log(`  Skipped: ${skipped.length}`);
+    console.log(`  Total: ${scenarios.length}`);
+  }
 
   if (failed.length > 0) {
-    console.log("\n❌ Failed scenarios:");
-    failed.forEach((f) => console.log(`  - ${f.scenario}`));
-    console.log("\nSee temp/emit-e2e-logs/ for details");
+    if (!silent) {
+      console.log("\n❌ Failed scenarios:");
+      failed.forEach((f) => console.log(`  - ${f.scenario}`));
+      console.log("\nSee temp/emit-e2e-logs/ for details");
+    }
     process.exit(1);
   }
 
-  console.log("\n✅ All scenarios emitted successfully!");
+  if (!silent) console.log("\n✅ All scenarios emitted successfully!");
 }
 
 main();
