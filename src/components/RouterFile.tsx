@@ -2,6 +2,7 @@ import { code, type Refkey, For } from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import type { HttpOperation } from "@typespec/http";
 import { fastifyLib } from "../external-packages/fastify.js";
+import { fastifyTypeProviderZod } from "../external-packages/fastify-type-provider-zod.js";
 import { getOperationInterfaceRef } from "./OperationInterface.js";
 
 export interface RouterFileProps {
@@ -44,6 +45,8 @@ export function RouterFile(props: RouterFileProps) {
         ]}
         returnType="void"
       >
+        {code`server.setValidatorCompiler(${fastifyTypeProviderZod.validatorCompiler});`}
+        {code`server.setSerializerCompiler(${fastifyTypeProviderZod.serializerCompiler});`}
         {code`await ${(
           <ts.FunctionCallExpression
             target={props.loadRoutesRef}

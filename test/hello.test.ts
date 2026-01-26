@@ -74,7 +74,7 @@ describe("typespec-fastify emitter", () => {
 
     expect(results["routes/items.routes.ts"]).toBeDefined();
     expect(results["routes/items.routes.ts"]).toContain("registerItemsRoutes");
-    expect(results["routes/items.routes.ts"]).toContain("fastify.get");
+    expect(results["routes/items.routes.ts"]).toContain("withTypeProvider");
   });
 
   it("generates model types", async () => {

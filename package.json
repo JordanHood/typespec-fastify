@@ -20,8 +20,22 @@
     "@alloy-js/core": ">=0.20.0",
     "@alloy-js/typescript": ">=0.20.0",
     "@typespec/compiler": ">=1.0.0",
-    "@typespec/emitter-framework": ">=0.14.0",
-    "@typespec/http": ">=1.0.0"
+    "@typespec/emitter-framework": ">=0.15.0",
+    "@typespec/http": ">=1.0.0",
+    "typespec-zod": ">=0.0.0-63",
+    "fastify-type-provider-zod": ">=4.0.0",
+    "zod": ">=3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "fastify-type-provider-zod": {
+      "optional": false
+    },
+    "zod": {
+      "optional": false
+    },
+    "typespec-zod": {
+      "optional": false
+    }
   },
   "files": [
     "dist",
@@ -67,6 +81,7 @@
     "@typescript-eslint/eslint-plugin": "8.53.0",
     "@typescript-eslint/parser": "8.53.0",
     "@typespec/compiler": "1.8.0",
+    "@typespec/emitter-framework": "0.15.0",
     "@typespec/http-specs": "0.1.0-alpha.30",
     "@typespec/spector": "0.1.0-alpha.22",
     "@vitest/coverage-v8": "4.0.17",
@@ -75,9 +90,12 @@
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.5",
     "fastify": "5.6.2",
+    "fastify-type-provider-zod": "4.0.2",
     "prettier": "3.7.4",
     "typescript": "5.9.3",
     "typescript-eslint": "8.53.0",
-    "vitest": "4.0.17"
+    "typespec-zod": "0.0.0-63",
+    "vitest": "4.0.17",
+    "zod": "3.24.1"
   }
 }

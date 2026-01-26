@@ -65,9 +65,11 @@ export function OperationInterface(props: OperationInterfaceProps) {
             }
 
             if (operation.parameters.body) {
+              const bodyParam = operation.parameters.body;
               parameters.push({
                 name: "body",
-                type: <TypeExpression type={operation.parameters.body.type} />,
+                type: <TypeExpression type={bodyParam.type} />,
+                optional: bodyParam.property?.optional ?? false,
               });
             }
 

@@ -17,9 +17,6 @@ importers:
       '@alloy-js/typescript':
         specifier: '>=0.20.0'
         version: 0.22.0
-      '@typespec/emitter-framework':
-        specifier: '>=0.14.0'
-        version: 0.14.0(@alloy-js/core@0.22.0)(@alloy-js/csharp@0.21.0)(@alloy-js/typescript@0.22.0)(@typespec/compiler@1.8.0(@types/node@25.0.8))
       '@typespec/http':
         specifier: '>=1.0.0'
         version: 1.8.0(@typespec/compiler@1.8.0(@types/node@25.0.8))
@@ -45,6 +42,9 @@ importers:
       '@typespec/compiler':
         specifier: 1.8.0
         version: 1.8.0(@types/node@25.0.8)
+      '@typespec/emitter-framework':
+        specifier: 0.15.0
+        version: 0.15.0(@alloy-js/core@0.22.0)(@alloy-js/csharp@0.21.0)(@alloy-js/python@0.3.0)(@alloy-js/typescript@0.22.0)(@typespec/compiler@1.8.0(@types/node@25.0.8))
       '@typespec/http-specs':
         specifier: 0.1.0-alpha.30
         version: 0.1.0-alpha.30(@types/node@25.0.8)(@typespec/compiler@1.8.0(@types/node@25.0.8))(@typespec/http@1.8.0(@typespec/compiler@1.8.0(@types/node@25.0.8)))(@typespec/rest@0.78.0(@typespec/compiler@1.8.0(@types/node@25.0.8))(@typespec/http@1.8.0(@typespec/compiler@1.8.0(@types/node@25.0.8))))(@typespec/versioning@0.78.0(@typespec/compiler@1.8.0(@types/node@25.0.8)))(@typespec/xml@0.78.0(@typespec/compiler@1.8.0(@types/node@25.0.8)))
@@ -69,6 +69,9 @@ importers:
       fastify:
         specifier: 5.6.2
         version: 5.6.2
+      fastify-type-provider-zod:
+        specifier: ^4.0.2
+        version: 4.0.2(fastify@5.6.2)(zod@3.25.76)
       prettier:
         specifier: 3.7.4
         version: 3.7.4
@@ -78,9 +81,15 @@ importers:
       typescript-eslint:
         specifier: 8.53.0
         version: 8.53.0(eslint@9.39.2)(typescript@5.9.3)
+      typespec-zod:
+        specifier: ^0.0.0-63
+        version: 0.0.0-63(@alloy-js/core@0.22.0)(@alloy-js/typescript@0.22.0)(@typespec/compiler@1.8.0(@types/node@25.0.8))(@typespec/emitter-framework@0.15.0(@alloy-js/core@0.22.0)(@alloy-js/csharp@0.21.0)(@alloy-js/python@0.3.0)(@alloy-js/typescript@0.22.0)(@typespec/compiler@1.8.0(@types/node@25.0.8)))
       vitest:
         specifier: 4.0.17
         version: 4.0.17(@types/node@25.0.8)(@vitest/ui@4.0.17)(yaml@2.8.2)
+      zod:
+        specifier: ^3.24.1
+        version: 3.25.76
 
 packages:
 
@@ -113,6 +122,9 @@ packages:
 
   '@alloy-js/msbuild@0.21.0':
     resolution: {integrity: sha512-QmMwF7eoYMdR5mX+8cIKb5F3Mgi3uQlFYrGYq92ht6BOc/XKyBXIwCXq6zqPMAT7nd2BHDD2hvgbL6nLS4QcGg==}
+
+  '@alloy-js/python@0.3.0':
+    resolution: {integrity: sha512-VujQyh6aGC5oAXvmtKcDGYg3rRgU01IvN5uOu6u5m/kXR7rUTsndrv960r0bBniIL+EvRF3CMu7E6EEcbb3Pyg==}
 
   '@alloy-js/typescript@0.22.0':
     resolution: {integrity: sha512-jARBNxAA5aEhysleFFd7cGfjckkEXLCH9kDaJSH5xBOu4cU0v7q5TvAqgPlEIkhfOh2983XLX0nVtZu01p0UjQ==}
@@ -1020,13 +1032,14 @@ packages:
     engines: {node: '>=20.0.0'}
     hasBin: true
 
-  '@typespec/emitter-framework@0.14.0':
-    resolution: {integrity: sha512-35C9XlLOFk2hQ85Hf6YT19gWOz4SfVgOCoBMs4rgx/KrJj7qM/AbdXjuSO+QLp76a928NWAAHQhbq5NbOpKztw==}
+  '@typespec/emitter-framework@0.15.0':
+    resolution: {integrity: sha512-vdXyLKV8gTOoya6MBoGhEKHwg2Dwc2BOexskCKONvWLmCqb8lmEKjfTsdhNgNuVqDHJIXapXnsf6WqTwJtZGOA==}
     peerDependencies:
-      '@alloy-js/core': ^0.21.0
-      '@alloy-js/csharp': ^0.21.0
-      '@alloy-js/typescript': ^0.21.0
-      '@typespec/compiler': ^1.7.0
+      '@alloy-js/core': ^0.22.0
+      '@alloy-js/csharp': ^0.22.0
+      '@alloy-js/python': ^0.3.0
+      '@alloy-js/typescript': ^0.22.0
+      '@typespec/compiler': ^1.8.0
 
   '@typespec/http-specs@0.1.0-alpha.30':
     resolution: {integrity: sha512-9c/npRHmX+IL4iAuXcDw5Jyy/exTu7IEp4i+JxYj43e+/g8gzFKFRMtJhcrH2xaABMFtrDW5oxXz0mh8PJaIjg==}
@@ -1621,6 +1634,12 @@ packages:
   fast-xml-parser@5.3.3:
     resolution: {integrity: sha512-2O3dkPAAC6JavuMm8+4+pgTk+5hoAs+CjZ+sWcQLkX9+/tHRuTkQh/Oaifr8qDmZ8iEHb771Ea6G8CdwkrgvYA==}
     hasBin: true
+
+  fastify-type-provider-zod@4.0.2:
+    resolution: {integrity: sha512-FDRzSL3ZuoZ+4YDevR1YOinmDKkxOdy3QB9dDR845sK+bQvDroPKhHAXLEAOObDxL7SMA0OZN/A4osrNBTdDTQ==}
+    peerDependencies:
+      fastify: ^5.0.0
+      zod: ^3.14.2
 
   fastify@5.6.2:
     resolution: {integrity: sha512-dPugdGnsvYkBlENLhCgX8yhyGCsCPrpA8lFWbTNU428l+YOnLgYHR69hzV8HWPC79n536EqzqQtvhtdaCE0dKg==}
@@ -2707,6 +2726,14 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  typespec-zod@0.0.0-63:
+    resolution: {integrity: sha512-rsxo0tTFRo4Dxgqw9tp9Cm/p4lEilMEhvuKdPY4UGBomhAtjUDXYoCFllExVcsfKeD180zD4aP8lJ/Ry5am/Bg==}
+    peerDependencies:
+      '@alloy-js/core': ^0.22.0
+      '@alloy-js/typescript': ^0.22.0
+      '@typespec/compiler': ^1.7.0
+      '@typespec/emitter-framework': ^0.15.0-dev.2
+
   undici-types@7.16.0:
     resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
 
@@ -2919,6 +2946,14 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
+  zod-to-json-schema@3.25.1:
+    resolution: {integrity: sha512-pM/SU9d3YAggzi6MtR4h7ruuQlqKtad8e9S0fmxcMi+ueAK5Korys/aWcV9LIIHTVbj01NdzxcnXSN+O74ZIVA==}
+    peerDependencies:
+      zod: ^3.25 || ^4
+
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
 snapshots:
 
   '@alloy-js/babel-plugin-jsx-dom-expressions@0.39.1(@babel/core@7.28.5)':
@@ -2989,6 +3024,12 @@ snapshots:
       '@alloy-js/core': 0.21.0
       change-case: 5.4.4
       marked: 16.4.2
+      pathe: 2.0.3
+
+  '@alloy-js/python@0.3.0':
+    dependencies:
+      '@alloy-js/core': 0.22.0
+      change-case: 5.4.4
       pathe: 2.0.3
 
   '@alloy-js/typescript@0.22.0':
@@ -4041,10 +4082,11 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@typespec/emitter-framework@0.14.0(@alloy-js/core@0.22.0)(@alloy-js/csharp@0.21.0)(@alloy-js/typescript@0.22.0)(@typespec/compiler@1.8.0(@types/node@25.0.8))':
+  '@typespec/emitter-framework@0.15.0(@alloy-js/core@0.22.0)(@alloy-js/csharp@0.21.0)(@alloy-js/python@0.3.0)(@alloy-js/typescript@0.22.0)(@typespec/compiler@1.8.0(@types/node@25.0.8))':
     dependencies:
       '@alloy-js/core': 0.22.0
       '@alloy-js/csharp': 0.21.0
+      '@alloy-js/python': 0.3.0
       '@alloy-js/typescript': 0.22.0
       '@typespec/compiler': 1.8.0(@types/node@25.0.8)
 
@@ -4736,6 +4778,13 @@ snapshots:
   fast-xml-parser@5.3.3:
     dependencies:
       strnum: 2.1.2
+
+  fastify-type-provider-zod@4.0.2(fastify@5.6.2)(zod@3.25.76):
+    dependencies:
+      '@fastify/error': 4.2.0
+      fastify: 5.6.2
+      zod: 3.25.76
+      zod-to-json-schema: 3.25.1(zod@3.25.76)
 
   fastify@5.6.2:
     dependencies:
@@ -5816,6 +5865,16 @@ snapshots:
 
   typescript@5.9.3: {}
 
+  typespec-zod@0.0.0-63(@alloy-js/core@0.22.0)(@alloy-js/typescript@0.22.0)(@typespec/compiler@1.8.0(@types/node@25.0.8))(@typespec/emitter-framework@0.15.0(@alloy-js/core@0.22.0)(@alloy-js/csharp@0.21.0)(@alloy-js/python@0.3.0)(@alloy-js/typescript@0.22.0)(@typespec/compiler@1.8.0(@types/node@25.0.8))):
+    dependencies:
+      '@alloy-js/core': 0.22.0
+      '@alloy-js/typescript': 0.22.0
+      '@typespec/compiler': 1.8.0(@types/node@25.0.8)
+      '@typespec/emitter-framework': 0.15.0(@alloy-js/core@0.22.0)(@alloy-js/csharp@0.21.0)(@alloy-js/python@0.3.0)(@alloy-js/typescript@0.22.0)(@typespec/compiler@1.8.0(@types/node@25.0.8))
+      '@typespec/http': 1.8.0(@typespec/compiler@1.8.0(@types/node@25.0.8))
+    transitivePeerDependencies:
+      - '@typespec/streams'
+
   undici-types@7.16.0: {}
 
   unicorn-magic@0.4.0: {}
@@ -5992,3 +6051,9 @@ snapshots:
       yargs-parser: 22.0.0
 
   yocto-queue@0.1.0: {}
+
+  zod-to-json-schema@3.25.1(zod@3.25.76):
+    dependencies:
+      zod: 3.25.76
+
+  zod@3.25.76: {}
