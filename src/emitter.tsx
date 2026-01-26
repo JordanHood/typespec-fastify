@@ -6,7 +6,10 @@ import { ModelsDirectory } from "./components/ModelsDirectory.js";
 import { OperationsDirectory } from "./components/OperationsDirectory.js";
 import { RouterFile } from "./components/RouterFile.js";
 import { RoutesDirectory } from "./components/RoutesDirectory.js";
+import { ZodSchemasDirectory } from "./components/ZodSchemasDirectory.js";
 import { fastifyLib } from "./external-packages/fastify.js";
+import { fastifyTypeProviderZod } from "./external-packages/fastify-type-provider-zod.js";
+import { zod } from "typespec-zod";
 import { EmitterOptions } from "./lib.js";
 import {
   getHttpOperations,
@@ -33,11 +36,12 @@ export async function $onEmit(context: EmitContext<EmitterOptions>) {
     context.program,
     <Output
       program={context.program}
-      externals={[fastifyLib]}
+      externals={[fastifyLib, zod, fastifyTypeProviderZod]}
       namePolicy={createTSNamePolicy()}
     >
       <SourceDirectory path=".">
         <ModelsDirectory namespace={httpInfo.namespace} types={allTypes} />
+        <ZodSchemasDirectory namespace={httpInfo.namespace} types={allTypes} />
         <OperationsDirectory groupedOperations={groupedOperations} />
         <RoutesDirectory
           groupedOperations={groupedOperations}

@@ -1,11 +1,20 @@
-import { For, List, refkey, type Refkey, type Children } from "@alloy-js/core";
+import {
+  code,
+  For,
+  List,
+  refkey,
+  type Refkey,
+  type Children,
+} from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import { useTSNamePolicy } from "@alloy-js/typescript";
 import type { HttpOperation } from "@typespec/http";
 import { isVoidType } from "@typespec/compiler";
 import { getHttpVerb } from "../utils/http-helpers.js";
 import { fastifyLib } from "../external-packages/fastify.js";
+import { fastifyTypeProviderZod } from "../external-packages/fastify-type-provider-zod.js";
 import { getOperationInterfaceRef } from "./OperationInterface.js";
+import { ZodSchema, zod } from "typespec-zod";
 
 export interface RouteRegistrationProps {
   containerName: string;
@@ -21,8 +30,8 @@ export function getRouteRegistrationRef(containerName: string): Refkey {
 }
 
 /**
- * Generates Fastify route registration functions.
- * This creates a function that registers all routes for a resource.
+ * Generates Fastify route registration functions with Zod schema validation.
+ * Uses fastify-type-provider-zod for automatic type inference and runtime validation.
  */
 export function RouteRegistration(props: RouteRegistrationProps) {
   const { containerName, operations } = props;
@@ -47,6 +56,11 @@ export function RouteRegistration(props: RouteRegistrationProps) {
       returnType="void"
     >
       <List>
+        <ts.VarDeclaration name="server" const>
+          fastify.withTypeProvider{"<"}
+          {fastifyTypeProviderZod.ZodTypeProvider}
+          {">"}()
+        </ts.VarDeclaration>
         <For each={operations} hardline>
           {(operation) => {
             const verb = getHttpVerb(operation);
@@ -59,7 +73,7 @@ export function RouteRegistration(props: RouteRegistrationProps) {
               }
             }
 
-            const path = rawPath.replace(/\{([^}]+)\}/g, function (match, p1) {
+            const path = rawPath.replace(/\{([^}]+)\}/g, function (_match, p1) {
               const paramName = p1.startsWith("/") ? p1.slice(1) : p1;
               const prefix = p1.startsWith("/") ? "/:" : ":";
               const suffix = optionalParams.has(paramName) ? "?" : "";
@@ -71,22 +85,118 @@ export function RouteRegistration(props: RouteRegistrationProps) {
               "function",
             );
 
+            const routeSchema = generateZodRouteSchema(operation);
+
             return (
               <>
-                <ts.FunctionCallExpression
-                  target={<>fastify.{verb}</>}
-                  args={[
-                    <>'{path}'</>,
-                    generateRouteHandler(operation, opName, namePolicy),
-                  ]}
-                />
-                {";"}
+                {code`server.${verb}('${path}', ${routeSchema}, ${generateRouteHandler(operation, opName, namePolicy)});`}
               </>
             );
           }}
         </For>
       </List>
     </ts.FunctionDeclaration>
+  );
+}
+
+function generateZodRouteSchema(operation: HttpOperation): Children {
+  const schemaProps: Children[] = [];
+
+  const pathParams = operation.parameters.parameters.filter(function (p) {
+    return p.type === "path";
+  });
+
+  if (pathParams.length > 0) {
+    const pathProperties: Children[] = [];
+    for (let i = 0; i < pathParams.length; i++) {
+      const param = pathParams[i];
+      const paramName = param.param.name;
+      const isOptional = param.param.optional;
+      if (i > 0) pathProperties.push(<>, </>);
+      if (isOptional) {
+        pathProperties.push(
+          <>
+            {paramName}: <ZodSchema type={param.param.type} />
+            .optional()
+          </>,
+        );
+      } else {
+        pathProperties.push(
+          <>
+            {paramName}: <ZodSchema type={param.param.type} />
+          </>,
+        );
+      }
+    }
+    schemaProps.push(
+      <>
+        params: {zod.z}.object({"{"}
+        {pathProperties}
+        {"}"})
+      </>,
+    );
+  }
+
+  const queryParams = operation.parameters.parameters.filter(function (p) {
+    return p.type === "query";
+  });
+
+  if (queryParams.length > 0) {
+    if (schemaProps.length > 0) schemaProps.push(<>, </>);
+    const queryProperties: Children[] = [];
+    for (let i = 0; i < queryParams.length; i++) {
+      const param = queryParams[i];
+      const paramName = param.param.name;
+      const isOptional = param.param.optional;
+      if (i > 0) queryProperties.push(<>, </>);
+      if (isOptional) {
+        queryProperties.push(
+          <>
+            {paramName}: <ZodSchema type={param.param.type} />
+            .optional()
+          </>,
+        );
+      } else {
+        queryProperties.push(
+          <>
+            {paramName}: <ZodSchema type={param.param.type} />
+          </>,
+        );
+      }
+    }
+    schemaProps.push(
+      <>
+        querystring: {zod.z}.object({"{"}
+        {queryProperties}
+        {"}"})
+      </>,
+    );
+  }
+
+  if (operation.parameters.body) {
+    const bodyParam = operation.parameters.body;
+    const isOptional = bodyParam.property?.optional ?? false;
+
+    if (!isOptional) {
+      if (schemaProps.length > 0) schemaProps.push(<>, </>);
+      schemaProps.push(
+        <>
+          body: <ZodSchema type={bodyParam.type} />
+        </>,
+      );
+    }
+  }
+
+  if (schemaProps.length === 0) {
+    return <ts.ObjectExpression />;
+  }
+
+  return (
+    <ts.ObjectExpression>
+      schema: {"{"}
+      {schemaProps}
+      {"}"}
+    </ts.ObjectExpression>
   );
 }
 
@@ -100,12 +210,19 @@ function generateRouteHandler(
   for (const param of operation.parameters.parameters) {
     if (param.type === "path") {
       const paramName = namePolicy.getName(param.param.name, "parameter");
-      callArgs.push(<>(request.params as any).{paramName}</>);
+      callArgs.push(<>request.params.{paramName}</>);
     }
   }
 
   if (operation.parameters.body) {
-    callArgs.push(<>request.body as any</>);
+    const bodyParam = operation.parameters.body;
+    const isOptional = bodyParam.property?.optional ?? false;
+
+    if (isOptional) {
+      callArgs.push(<>request.body as any</>);
+    } else {
+      callArgs.push(<>request.body</>);
+    }
   }
 
   for (const param of operation.parameters.parameters) {
@@ -128,18 +245,16 @@ function generateRouteHandler(
   if (queryParams.length > 0) {
     const optionsObj = (
       <ts.ObjectExpression>
-        {queryParams.map((param, index) => {
-          const paramName = namePolicy.getName(
-            param.param.name,
-            "object-member-data",
-          );
-          return (
-            <>
-              {index > 0 && ", "}
-              {paramName}: (request.query as any).{paramName}
-            </>
-          );
-        })}
+        {queryParams
+          .map(function (param, index) {
+            const paramName = namePolicy.getName(
+              param.param.name,
+              "object-member-data",
+            );
+            const separator = index > 0 ? ", " : "";
+            return `${separator}${paramName}: request.query.${paramName}`;
+          })
+          .join("")}
       </ts.ObjectExpression>
     );
     callArgs.push(optionsObj);
@@ -154,10 +269,7 @@ function generateRouteHandler(
   return (
     <ts.FunctionExpression
       async
-      parameters={[
-        { name: "request", type: fastifyLib.FastifyRequest },
-        { name: "reply", type: fastifyLib.FastifyReply },
-      ]}
+      parameters={[{ name: "request" }, { name: "reply" }]}
     >
       <List>
         <>try {"{"}</>

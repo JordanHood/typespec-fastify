@@ -1,11 +1,25 @@
 import { createTypeSpecLibrary, JSONSchemaType } from "@typespec/compiler";
 
-export type EmitterOptions = Record<string, never>;
+export interface EmitterOptions {
+  /**
+   * Schema validation library to use.
+   * Currently only "zod" is supported.
+   * @default "zod"
+   */
+  schemaType?: "zod" | "typebox";
+}
 
 const EmitterOptionsSchema: JSONSchemaType<EmitterOptions> = {
   type: "object",
   additionalProperties: false,
-  properties: {},
+  properties: {
+    schemaType: {
+      type: "string",
+      enum: ["zod", "typebox"],
+      nullable: true,
+      default: "zod",
+    },
+  },
   required: [],
 };
 

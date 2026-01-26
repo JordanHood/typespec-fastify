@@ -62,7 +62,7 @@ export function RoutesDirectory(props: RoutesDirectoryProps) {
         >
           <List>
             <For each={containerNames}>
-              {(containerName) => {
+              {function (containerName) {
                 const routeRegRef = getRouteRegistrationRef(containerName);
                 const containerKey = containerName.toLowerCase();
                 return (
@@ -70,9 +70,9 @@ export function RoutesDirectory(props: RoutesDirectoryProps) {
                     await{" "}
                     <ts.FunctionCallExpression
                       target={routeRegRef}
-                      args={[<>server</>, <>operations.{containerKey}</>]}
+                      args={["server", `operations.${containerKey}`]}
                     />
-                    {";"}
+                    ;
                   </>
                 );
               }}

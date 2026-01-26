@@ -1,10 +1,9 @@
 // @ts-check
-import eslint from "@eslint/js";
-import tsEslint from "typescript-eslint";
+import neostandard from "neostandard";
 import prettierConfig from "eslint-config-prettier";
 import prettierPlugin from "eslint-plugin-prettier";
 
-export default tsEslint.config(
+export default [
   {
     ignores: [
       "**/dist/**/*",
@@ -21,8 +20,9 @@ export default tsEslint.config(
       "**/test/e2e/parameters/collection-format.e2e.ts",
     ],
   },
-  eslint.configs.recommended,
-  ...tsEslint.configs.recommended,
+  ...neostandard({
+    ts: true,
+  }),
   prettierConfig,
   {
     plugins: {
@@ -30,6 +30,7 @@ export default tsEslint.config(
     },
     rules: {
       "prettier/prettier": "error",
+      "react/jsx-key": "off",
     },
   },
-);
+];

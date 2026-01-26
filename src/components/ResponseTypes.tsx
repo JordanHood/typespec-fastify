@@ -34,23 +34,3 @@ export function ResponseTypes() {
     </>
   );
 }
-/**
- * not quite working yields
- * export interface ResponseWithBody<t> {
-    statusCode: number;
-    body: T
-    }
- */
-{
-  /* <ts.InterfaceDeclaration
-  name="ResponseWithBody"
-  export
-  refkey={responseWithBodyRef}
-  typeParameters={[{ name: "T" }]}
->
-<>
-    statusCode: number;{"\n"}
-    body: T
-  </>
-</ts.InterfaceDeclaration> */
-}
