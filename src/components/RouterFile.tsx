@@ -50,7 +50,7 @@ export function RouterFile(props: RouterFileProps) {
         {code`await ${(
           <ts.FunctionCallExpression
             target={props.loadRoutesRef}
-            args={[<>server</>, <>operations</>]}
+            args={["server", "operations"]}
           />
         )};`}
       </ts.FunctionDeclaration>

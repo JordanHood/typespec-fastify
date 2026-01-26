@@ -73,7 +73,7 @@ export function RouteRegistration(props: RouteRegistrationProps) {
               }
             }
 
-            const path = rawPath.replace(/\{([^}]+)\}/g, function (match, p1) {
+            const path = rawPath.replace(/\{([^}]+)\}/g, function (_match, p1) {
               const paramName = p1.startsWith("/") ? p1.slice(1) : p1;
               const prefix = p1.startsWith("/") ? "/:" : ":";
               const suffix = optionalParams.has(paramName) ? "?" : "";
@@ -188,7 +188,7 @@ function generateZodRouteSchema(operation: HttpOperation): Children {
   }
 
   if (schemaProps.length === 0) {
-    return <ts.ObjectExpression></ts.ObjectExpression>;
+    return <ts.ObjectExpression />;
   }
 
   return (
@@ -245,18 +245,16 @@ function generateRouteHandler(
   if (queryParams.length > 0) {
     const optionsObj = (
       <ts.ObjectExpression>
-        {queryParams.map((param, index) => {
-          const paramName = namePolicy.getName(
-            param.param.name,
-            "object-member-data",
-          );
-          return (
-            <>
-              {index > 0 && ", "}
-              {paramName}: request.query.{paramName}
-            </>
-          );
-        })}
+        {queryParams
+          .map(function (param, index) {
+            const paramName = namePolicy.getName(
+              param.param.name,
+              "object-member-data",
+            );
+            const separator = index > 0 ? ", " : "";
+            return `${separator}${paramName}: request.query.${paramName}`;
+          })
+          .join("")}
       </ts.ObjectExpression>
     );
     callArgs.push(optionsObj);
