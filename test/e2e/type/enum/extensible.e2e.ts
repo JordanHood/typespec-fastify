@@ -21,13 +21,13 @@ describe("Type.Enum.Extensible", () => {
     const stringOps: String = {
       getKnownValue: async function () {
         return {
-          contentType: "application/json",
+          statusCode: 200,
           body: "Monday",
         };
       },
       getUnknownValue: async function () {
         return {
-          contentType: "application/json",
+          statusCode: 200,
           body: "Weekend",
         };
       },
@@ -35,13 +35,17 @@ describe("Type.Enum.Extensible", () => {
         body: DaysOfWeekExtensibleEnum,
         contentType: "application/json",
       ) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       putUnknownValue: async function (
         body: DaysOfWeekExtensibleEnum,
         contentType: "application/json",
       ) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 

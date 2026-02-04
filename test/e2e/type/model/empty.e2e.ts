@@ -19,13 +19,21 @@ describe("Type.Model.Empty", () => {
   it("passes all scenarios", async () => {
     const operations: Empty = {
       async putEmpty(body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       async getEmpty() {
-        return { body: {} };
+        return {
+          statusCode: 200,
+          body: {},
+        };
       },
       async postRoundTripEmpty(body) {
-        return { body: {} };
+        return {
+          statusCode: 200,
+          body: {},
+        };
       },
     };
 

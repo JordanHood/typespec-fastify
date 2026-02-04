@@ -66,6 +66,12 @@ export function RouteRegistration(props: RouteRegistrationProps) {
             const verb = getHttpVerb(operation);
             const rawPath = operation.uriTemplate || operation.path;
 
+            const queryStartIndex = rawPath.indexOf("{?");
+            const pathWithoutQuery =
+              queryStartIndex >= 0
+                ? rawPath.substring(0, queryStartIndex)
+                : rawPath;
+
             const optionalParams = new Set();
             for (const param of operation.parameters.parameters) {
               if (param.type === "path" && param.param.optional) {
@@ -73,12 +79,15 @@ export function RouteRegistration(props: RouteRegistrationProps) {
               }
             }
 
-            const path = rawPath.replace(/\{([^}]+)\}/g, function (_match, p1) {
-              const paramName = p1.startsWith("/") ? p1.slice(1) : p1;
-              const prefix = p1.startsWith("/") ? "/:" : ":";
-              const suffix = optionalParams.has(paramName) ? "?" : "";
-              return prefix + paramName + suffix;
-            });
+            const path = pathWithoutQuery.replace(
+              /\{([^}]+)\}/g,
+              function (_match, p1) {
+                const paramName = p1.startsWith("/") ? p1.slice(1) : p1;
+                const prefix = p1.startsWith("/") ? "/:" : ":";
+                const suffix = optionalParams.has(paramName) ? "?" : "";
+                return prefix + paramName + suffix;
+              },
+            );
 
             const opName = namePolicy.getName(
               operation.operation.name,
@@ -149,19 +158,55 @@ function generateZodRouteSchema(operation: HttpOperation): Children {
       const paramName = param.param.name;
       const isOptional = param.param.optional;
       if (i > 0) queryProperties.push(<>, </>);
-      if (isOptional) {
-        queryProperties.push(
-          <>
-            {paramName}: <ZodSchema type={param.param.type} />
-            .optional()
-          </>,
-        );
+      const paramType = param.param.type;
+      const needsNumberCoercion =
+        paramType.kind === "Scalar" &&
+        (paramType.name === "numeric" ||
+          paramType.name === "integer" ||
+          paramType.name === "float" ||
+          paramType.name === "decimal" ||
+          paramType.name === "decimal128" ||
+          paramType.name === "int8" ||
+          paramType.name === "int16" ||
+          paramType.name === "int32" ||
+          paramType.name === "int64" ||
+          paramType.name === "uint8" ||
+          paramType.name === "uint16" ||
+          paramType.name === "uint32" ||
+          paramType.name === "uint64" ||
+          paramType.name === "safeint" ||
+          paramType.name === "float32" ||
+          paramType.name === "float64");
+
+      if (needsNumberCoercion) {
+        if (isOptional) {
+          queryProperties.push(
+            <>
+              {paramName}: {zod.z}.coerce.number().optional()
+            </>,
+          );
+        } else {
+          queryProperties.push(
+            <>
+              {paramName}: {zod.z}.coerce.number()
+            </>,
+          );
+        }
       } else {
-        queryProperties.push(
-          <>
-            {paramName}: <ZodSchema type={param.param.type} />
-          </>,
-        );
+        const baseSchema = <ZodSchema type={param.param.type} />;
+        if (isOptional) {
+          queryProperties.push(
+            <>
+              {paramName}: {baseSchema}.optional()
+            </>,
+          );
+        } else {
+          queryProperties.push(
+            <>
+              {paramName}: {baseSchema}
+            </>,
+          );
+        }
       }
     }
     schemaProps.push(
@@ -266,6 +311,16 @@ function generateRouteHandler(
   });
   const isNoContent = isVoid || is204Response;
 
+  const contentType = operation.responses
+    .find(function (r) {
+      return r.responses.some(function (rc) {
+        return rc.body?.contentTypes && rc.body.contentTypes.length > 0;
+      });
+    })
+    ?.responses.find(function (rc) {
+      return rc.body?.contentTypes && rc.body.contentTypes.length > 0;
+    })?.body?.contentTypes[0];
+
   return (
     <ts.FunctionExpression
       async
@@ -283,6 +338,16 @@ function generateRouteHandler(
           </ts.VarDeclaration>
           {isNoContent ? (
             <>reply.code(result.statusCode).send();</>
+          ) : contentType === "application/json" ? (
+            <>
+              reply.type('application/json').code(result.statusCode).send(
+              JSON.stringify(result.body) );
+            </>
+          ) : contentType ? (
+            <>
+              reply.type('{contentType}
+              ').code(result.statusCode).send(result.body);
+            </>
           ) : (
             <>reply.code(result.statusCode).send(result.body);</>
           )}

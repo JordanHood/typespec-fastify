@@ -32,127 +32,197 @@ describe("Type.Array", () => {
   it("passes all scenarios", async () => {
     const int32ValueOps: Int32Value = {
       get: async function () {
-        return [1, 2];
+        return {
+          statusCode: 200,
+          body: [1, 2],
+        };
       },
       put: async function (body: Array<number>) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const int64ValueOps: Int64Value = {
       get: async function () {
-        return [BigInt("9223372036854775807"), BigInt("-9223372036854775807")];
+        return {
+          statusCode: 200,
+          body: [BigInt("9223372036854775807"), BigInt("-9223372036854775807")],
+        };
       },
       put: async function (body: Array<bigint>) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const booleanValueOps: BooleanValue = {
       get: async function () {
-        return [true, false];
+        return {
+          statusCode: 200,
+          body: [true, false],
+        };
       },
       put: async function (body: Array<boolean>) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const stringValueOps: StringValue = {
       get: async function () {
-        return ["hello", ""];
+        return {
+          statusCode: 200,
+          body: ["hello", ""],
+        };
       },
       put: async function (body: Array<string>) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const float32ValueOps: Float32Value = {
       get: async function () {
-        return [43.125];
+        return {
+          statusCode: 200,
+          body: [43.125],
+        };
       },
       put: async function (body: Array<number>) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const datetimeValueOps: DatetimeValue = {
       get: async function () {
-        return [new Date("2022-08-26T18:38:00Z")];
+        return {
+          statusCode: 200,
+          body: [new Date("2022-08-26T18:38:00Z")],
+        };
       },
       put: async function (body: Array<Date>) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const durationValueOps: DurationValue = {
       get: async function () {
-        return ["P123DT22H14M12.011S"];
+        return {
+          statusCode: 200,
+          body: ["P123DT22H14M12.011S"],
+        };
       },
       put: async function (body: Array<string>) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const unknownValueOps: UnknownValue = {
       get: async function () {
-        return [1, "hello", null];
+        return {
+          statusCode: 200,
+          body: [1, "hello", null],
+        };
       },
       put: async function (body: Array<unknown>) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const modelValueOps: ModelValue = {
       get: async function () {
-        return [{ property: "hello" }, { property: "world" }];
+        return {
+          statusCode: 200,
+          body: [{ property: "hello" }, { property: "world" }],
+        };
       },
       put: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const nullableFloatValueOps: NullableFloatValue = {
       get: async function () {
-        return [1.25, null, 3.0];
+        return {
+          statusCode: 200,
+          body: [1.25, null, 3.0],
+        };
       },
       put: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const nullableBooleanValueOps: NullableBooleanValue = {
       get: async function () {
-        return [true, null, false];
+        return {
+          statusCode: 200,
+          body: [true, null, false],
+        };
       },
       put: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const nullableInt32ValueOps: NullableInt32Value = {
       get: async function () {
-        return [1, null, 3];
+        return {
+          statusCode: 200,
+          body: [1, null, 3],
+        };
       },
       put: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const nullableStringValueOps: NullableStringValue = {
       get: async function () {
-        return ["hello", null, "world"];
+        return {
+          statusCode: 200,
+          body: ["hello", null, "world"],
+        };
       },
       put: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const nullableModelValueOps: NullableModelValue = {
       get: async function () {
-        return [{ property: "hello" }, null, { property: "world" }];
+        return {
+          statusCode: 200,
+          body: [{ property: "hello" }, null, { property: "world" }],
+        };
       },
       put: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
