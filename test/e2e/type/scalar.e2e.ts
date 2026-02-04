@@ -26,43 +26,49 @@ describe("Type.Scalar", () => {
     const stringOps: String = {
       get: async function () {
         return {
-          contentType: "application/json",
+          statusCode: 200,
           body: "test",
         };
       },
       put: async function (body: string, contentType: "application/json") {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const booleanOps: Boolean = {
       get: async function () {
         return {
-          contentType: "application/json",
+          statusCode: 200,
           body: true,
         };
       },
       put: async function (body: boolean, contentType: "application/json") {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const unknownOps: Unknown = {
       get: async function () {
         return {
-          contentType: "application/json",
+          statusCode: 200,
           body: "test",
         };
       },
       put: async function (body: unknown, contentType: "application/json") {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const decimalTypeOps: DecimalType = {
       responseBody: async function () {
         return {
-          contentType: "application/json",
+          statusCode: 200,
           body: 0.33333,
         };
       },
@@ -70,17 +76,21 @@ describe("Type.Scalar", () => {
         body: number,
         contentType: "application/json",
       ) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
-      requestParameter: async function (options?: { value: number }) {
-        return;
+      requestParameter: async function (options: { value: number }) {
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const decimal128TypeOps: Decimal128Type = {
       responseBody: async function () {
         return {
-          contentType: "application/json",
+          statusCode: 200,
           body: 0.33333,
         };
       },
@@ -88,28 +98,42 @@ describe("Type.Scalar", () => {
         body: number,
         contentType: "application/json",
       ) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
-      requestParameter: async function (options?: { value: number }) {
-        return;
+      requestParameter: async function (options: { value: number }) {
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const decimalVerifyOps: DecimalVerify = {
       prepareVerify: async function () {
-        return [0.1, 0.1, 0.1];
+        return {
+          statusCode: 200,
+          body: [0.1, 0.1, 0.1],
+        };
       },
       verify: async function (body: number, contentType: "application/json") {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const decimal128VerifyOps: Decimal128Verify = {
       prepareVerify: async function () {
-        return [0.1, 0.1, 0.1];
+        return {
+          statusCode: 200,
+          body: [0.1, 0.1, 0.1],
+        };
       },
       verify: async function (body: number, contentType: "application/json") {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 

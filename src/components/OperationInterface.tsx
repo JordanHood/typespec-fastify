@@ -92,6 +92,9 @@ export function OperationInterface(props: OperationInterfaceProps) {
             );
 
             if (queryParams.length > 0) {
+              const allQueryParamsOptional = queryParams.every(
+                (p) => p.param.optional,
+              );
               const optionsType = (
                 <ts.InterfaceExpression>
                   <For each={queryParams} semicolon hardline>
@@ -115,7 +118,7 @@ export function OperationInterface(props: OperationInterfaceProps) {
               parameters.push({
                 name: "options",
                 type: optionsType,
-                optional: true,
+                optional: allQueryParamsOptional,
               });
             }
             const isVoid = isVoidType(operation.operation.returnType);
@@ -124,9 +127,28 @@ export function OperationInterface(props: OperationInterfaceProps) {
             });
             const shouldEmitVoid = isVoid || is204Response;
             const noContentRef = getNoContentResponseRef();
-            const returnType = shouldEmitVoid
-              ? code`Promise<${noContentRef}>`
-              : code`Promise<ResponseWithBody<${(<TypeExpression type={operation.operation.returnType} />)}>>`;
+
+            let returnType: Children;
+            if (shouldEmitVoid) {
+              returnType = code`Promise<${noContentRef}>`;
+            } else {
+              const responseBody = operation.responses
+                .find(function (r) {
+                  return r.responses.some(function (rc) {
+                    return rc.body != null;
+                  });
+                })
+                ?.responses.find(function (rc) {
+                  return rc.body != null;
+                })?.body;
+
+              if (responseBody) {
+                returnType = code`Promise<ResponseWithBody<${(<TypeExpression type={responseBody.type} />)}>>`;
+              } else {
+                returnType = code`Promise<ResponseWithBody<${(<TypeExpression type={operation.operation.returnType} />)}>>`;
+              }
+            }
+
             return (
               <ts.InterfaceMethod
                 name={opName}

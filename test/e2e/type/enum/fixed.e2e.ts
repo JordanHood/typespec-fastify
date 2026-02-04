@@ -21,7 +21,7 @@ describe("Type.Enum.Fixed", () => {
     const stringOps: String = {
       getKnownValue: async function () {
         return {
-          contentType: "application/json",
+          statusCode: 200,
           body: DaysOfWeekEnum.Monday,
         };
       },
@@ -29,7 +29,9 @@ describe("Type.Enum.Fixed", () => {
         body: DaysOfWeekEnum,
         contentType: "application/json",
       ) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       putUnknownValue: async function (
         body: DaysOfWeekEnum,

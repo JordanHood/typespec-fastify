@@ -19,13 +19,21 @@ describe("Type.Model.Usage", () => {
   it("passes all scenarios", async () => {
     const operations: Usage = {
       async input(body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       async output() {
-        return { requiredProp: "example-value" };
+        return {
+          statusCode: 200,
+          body: { requiredProp: "example-value" },
+        };
       },
       async inputAndOutput(body) {
-        return { requiredProp: "example-value" };
+        return {
+          statusCode: 200,
+          body: { requiredProp: "example-value" },
+        };
       },
     };
 

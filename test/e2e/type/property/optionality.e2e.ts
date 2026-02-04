@@ -34,250 +34,410 @@ describe("Type.Property.Optionality", () => {
   it("passes all scenarios", async () => {
     const stringOps: String = {
       getAll: async function () {
-        return { property: "hello" };
+        return {
+          statusCode: 200,
+          body: { property: "hello" },
+        };
       },
       getDefault: async function () {
-        return {};
+        return {
+          statusCode: 200,
+          body: {},
+        };
       },
       putAll: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       putDefault: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const bytesOps: Bytes = {
       getAll: async function () {
         return {
-          property: new Uint8Array(
-            Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64"),
-          ),
+          statusCode: 200,
+          body: {
+            property: new Uint8Array(
+              Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64"),
+            ),
+          },
         };
       },
       getDefault: async function () {
-        return {};
+        return {
+          statusCode: 200,
+          body: {},
+        };
       },
       putAll: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       putDefault: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const datetimeOps: Datetime = {
       getAll: async function () {
-        return { property: new Date("2022-08-26T18:38:00Z") };
+        return {
+          statusCode: 200,
+          body: { property: new Date("2022-08-26T18:38:00Z") },
+        };
       },
       getDefault: async function () {
-        return {};
+        return {
+          statusCode: 200,
+          body: {},
+        };
       },
       putAll: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       putDefault: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const durationOps: Duration = {
       getAll: async function () {
-        return { property: "P123DT22H14M12.011S" };
+        return {
+          statusCode: 200,
+          body: { property: "P123DT22H14M12.011S" },
+        };
       },
       getDefault: async function () {
-        return {};
+        return {
+          statusCode: 200,
+          body: {},
+        };
       },
       putAll: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       putDefault: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const plainDateOps: PlainDate = {
       getAll: async function () {
-        return { property: "2022-12-12" };
+        return {
+          statusCode: 200,
+          body: { property: "2022-12-12" },
+        };
       },
       getDefault: async function () {
-        return {};
+        return {
+          statusCode: 200,
+          body: {},
+        };
       },
       putAll: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       putDefault: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const plainTimeOps: PlainTime = {
       getAll: async function () {
-        return { property: "13:06:12" };
+        return {
+          statusCode: 200,
+          body: { property: "13:06:12" },
+        };
       },
       getDefault: async function () {
-        return {};
+        return {
+          statusCode: 200,
+          body: {},
+        };
       },
       putAll: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       putDefault: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const collectionsByteOps: CollectionsByte = {
       getAll: async function () {
         return {
-          property: [
-            new Uint8Array(Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64")),
-            new Uint8Array(Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64")),
-          ],
+          statusCode: 200,
+          body: {
+            property: [
+              new Uint8Array(Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64")),
+              new Uint8Array(Buffer.from("aGVsbG8sIHdvcmxkIQ==", "base64")),
+            ],
+          },
         };
       },
       getDefault: async function () {
-        return {};
+        return {
+          statusCode: 200,
+          body: {},
+        };
       },
       putAll: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       putDefault: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const collectionsModelOps: CollectionsModel = {
       getAll: async function () {
-        return { property: [{ property: "hello" }, { property: "world" }] };
+        return {
+          statusCode: 200,
+          body: { property: [{ property: "hello" }, { property: "world" }] },
+        };
       },
       getDefault: async function () {
-        return {};
+        return {
+          statusCode: 200,
+          body: {},
+        };
       },
       putAll: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       putDefault: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const stringLiteralOps: StringLiteral = {
       getAll: async function () {
-        return { property: "hello" };
+        return {
+          statusCode: 200,
+          body: { property: "hello" },
+        };
       },
       getDefault: async function () {
-        return {};
+        return {
+          statusCode: 200,
+          body: {},
+        };
       },
       putAll: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       putDefault: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const intLiteralOps: IntLiteral = {
       getAll: async function () {
-        return { property: 1 };
+        return {
+          statusCode: 200,
+          body: { property: 1 },
+        };
       },
       getDefault: async function () {
-        return {};
+        return {
+          statusCode: 200,
+          body: {},
+        };
       },
       putAll: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       putDefault: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const floatLiteralOps: FloatLiteral = {
       getAll: async function () {
-        return { property: 1.25 };
+        return {
+          statusCode: 200,
+          body: { property: 1.25 },
+        };
       },
       getDefault: async function () {
-        return {};
+        return {
+          statusCode: 200,
+          body: {},
+        };
       },
       putAll: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       putDefault: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const booleanLiteralOps: BooleanLiteral = {
       getAll: async function () {
-        return { property: true };
+        return {
+          statusCode: 200,
+          body: { property: true },
+        };
       },
       getDefault: async function () {
-        return {};
+        return {
+          statusCode: 200,
+          body: {},
+        };
       },
       putAll: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       putDefault: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const unionStringLiteralOps: UnionStringLiteral = {
       getAll: async function () {
-        return { property: "world" };
+        return {
+          statusCode: 200,
+          body: { property: "world" },
+        };
       },
       getDefault: async function () {
-        return {};
+        return {
+          statusCode: 200,
+          body: {},
+        };
       },
       putAll: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       putDefault: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const unionIntLiteralOps: UnionIntLiteral = {
       getAll: async function () {
-        return { property: 2 };
+        return {
+          statusCode: 200,
+          body: { property: 2 },
+        };
       },
       getDefault: async function () {
-        return {};
+        return {
+          statusCode: 200,
+          body: {},
+        };
       },
       putAll: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       putDefault: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const unionFloatLiteralOps: UnionFloatLiteral = {
       getAll: async function () {
-        return { property: 2.375 };
+        return {
+          statusCode: 200,
+          body: { property: 2.375 },
+        };
       },
       getDefault: async function () {
-        return {};
+        return {
+          statusCode: 200,
+          body: {},
+        };
       },
       putAll: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       putDefault: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 
     const requiredAndOptionalOps: RequiredAndOptional = {
       getAll: async function () {
-        return { optionalProperty: "hello", requiredProperty: 42 };
+        return {
+          statusCode: 200,
+          body: { optionalProperty: "hello", requiredProperty: 42 },
+        };
       },
       getRequiredOnly: async function () {
-        return { requiredProperty: 42 };
+        return {
+          statusCode: 200,
+          body: { requiredProperty: 42 },
+        };
       },
       putAll: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
       putRequiredOnly: async function (body) {
-        return;
+        return {
+          statusCode: 204,
+        };
       },
     };
 

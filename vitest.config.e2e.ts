@@ -11,6 +11,16 @@ export default defineConfig({
       "test/e2e/parameters/query.e2e.ts",
       "test/e2e/parameters/body-optionality.e2e.ts",
       "test/e2e/parameters/spread.e2e.ts",
+      "test/e2e/type/**/*.e2e.ts",
+    ],
+    exclude: [
+      "test/e2e/type/array.e2e.ts",
+      "test/e2e/type/dictionary.e2e.ts",
+      "test/e2e/type/union.e2e.ts",
+      "test/e2e/type/property/nullable.e2e.ts",
+      "test/e2e/type/property/additional-properties.e2e.ts",
+      "test/e2e/type/property/value-types.e2e.ts",
+      "test/e2e/type/property/optionality.e2e.ts",
     ],
   },
 });
